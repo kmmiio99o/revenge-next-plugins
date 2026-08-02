@@ -73,6 +73,10 @@ jobs:
         run: |
           ./gradlew packageAllPlugins --no-daemon
 
+      - name: Generate repository index
+        run: |
+          bunx revenge-plugin generate-index --dist dist --base-url "https://rn.kmmiio99o.dev" --out dist/index.json
+
       - name: Verify dist artifacts
         run: |
           ls -la dist/
