@@ -1,0 +1,16 @@
+{
+	"format": 1,
+	"id": "dev.kmmiio99o.chatbox-avatar",
+	"name": "Chatbox Avatar",
+	"description": "Quickly view your profile from the chatbox.",
+	"author": "kmmiio99o",
+	"icon": "UserSquareIcon",
+	"version": "1.0.0",
+	"dependencies": {
+		"revenge.api": { "version": ">=1" },
+		"discord": { "version": "*" }
+	},
+	"dist": {
+		"script": "index.js"
+	}
+}

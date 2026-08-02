@@ -296,7 +296,7 @@ pluginDefs.forEach { (dir, id, jarName, scriptName) ->
         }
 
         archiveFileName.set("$id.zip")
-        destinationDirectory.set(layout.buildDirectory.dir("dist"))
+        destinationDirectory.set(rootProject.layout.projectDirectory.dir("dist"))
         doLast { logger.lifecycle("Packaged $id -> ${archiveFile.get().asFile.relativeTo(rootDir)}") }
     }
 

@@ -1,0 +1,16 @@
+{
+	"format": 1,
+	"id": "dev.kmmiio99o.multi-scrobbler",
+	"name": "Multi Scrobbler",
+	"description": "Show off your music status from Last.fm, Libre.fm, or ListenBrainz on your Discord profile with comprehensive console logging.",
+	"author": "kmmiio99o",
+	"icon": "MusicIcon",
+	"version": "1.0.0",
+	"dependencies": {
+		"revenge.api": { "version": ">=1" },
+		"discord": { "version": "*" }
+	},
+	"dist": {
+		"script": "index.js"
+	}
+}

@@ -1,0 +1,16 @@
+{
+	"format": 1,
+	"id": "dev.kmmiio99o.alwaystrust",
+	"name": "Always Trust",
+	"description": "Remove untrusted link confirmation.",
+	"author": "kmmiio99o",
+	"icon": "LinkIcon",
+	"version": "1.0.0",
+	"dependencies": {
+		"revenge.api": { "version": ">=1" },
+		"discord": { "version": "*" }
+	},
+	"dist": {
+		"script": "index.js"
+	}
+}
