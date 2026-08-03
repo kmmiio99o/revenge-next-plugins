@@ -8,7 +8,8 @@ import type { MultiScrobblerStorage } from '../../../types'
 const TOKEN_URL = 'https://listenbrainz.org/settings/'
 
 export default function ListenBrainzSettingsPage() {
-	const { Page } = revenge.components
+	const { Page } =
+		revenge.components as typeof import('@revenge-mod/components')
 	const { ScrollView } = revenge.react.ReactNative
 	const { Stack, TableRowGroup, TableRow } = revenge.discord.design.Design
 

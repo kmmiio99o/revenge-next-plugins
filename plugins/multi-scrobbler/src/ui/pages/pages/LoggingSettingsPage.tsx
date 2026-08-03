@@ -3,7 +3,8 @@ import { getStorage } from '../../../lib/state'
 import type { MultiScrobblerStorage } from '../../../types'
 
 export default function LoggingSettingsPage() {
-	const { Page } = revenge.components
+	const { Page } =
+		revenge.components as typeof import('@revenge-mod/components')
 	const { ScrollView } = revenge.react.ReactNative
 	const { Stack, TableRowGroup, TableRow, TableSwitchRow } =
 		revenge.discord.design.Design

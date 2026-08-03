@@ -4,7 +4,8 @@ import RPCPreview from './components/RPCPreview'
 import type { MultiScrobblerStorage } from '../../../types'
 
 export default function RPCCustomizationSettingsPage() {
-	const { Page } = revenge.components
+	const { Page } =
+		revenge.components as typeof import('@revenge-mod/components')
 	const { ScrollView } = revenge.react.ReactNative
 	const { Stack, TableRowGroup, TableCheckboxRow, TableRow } =
 		revenge.discord.design.Design

@@ -1,4 +1,5 @@
 import { DEFAULTS } from './defaults'
+import type { PluginApi } from '@revenge-mod/plugins/types'
 import type {
 	ChatboxAvatarStorage,
 	Position,
@@ -9,9 +10,10 @@ import type {
 export default function Settings({
 	api,
 }: {
-	api: RevengePluginStartApi<ChatboxAvatarStorage>
+	api: PluginApi<{ jsonStorage: ChatboxAvatarStorage }>
 }) {
-	const { Page } = revenge.components
+	const { Page } =
+		revenge.components as typeof import('@revenge-mod/components')
 	const { ScrollView } = revenge.react.ReactNative
 	const {
 		Stack,

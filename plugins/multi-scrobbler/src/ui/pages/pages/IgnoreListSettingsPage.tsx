@@ -6,7 +6,8 @@ import type { MultiScrobblerStorage } from '../../../types'
 
 export default function IgnoreListSettingsPage() {
 	const React = revenge.react.React
-	const { Page } = revenge.components
+	const { Page } =
+		revenge.components as typeof import('@revenge-mod/components')
 	const { ScrollView, TouchableOpacity, Image } = revenge.react.ReactNative
 	const { Stack, TableRowGroup, TableRow } = revenge.discord.design.Design
 

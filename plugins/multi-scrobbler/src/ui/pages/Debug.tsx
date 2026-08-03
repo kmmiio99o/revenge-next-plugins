@@ -6,7 +6,8 @@ import {
 
 export default function Debug() {
 	const React = revenge.react.React
-	const { Page } = revenge.components
+	const { Page } =
+		revenge.components as typeof import('@revenge-mod/components')
 	const { ScrollView } = revenge.react.ReactNative
 	const { TableRowGroup, TableRow } = revenge.discord.design.Design
 

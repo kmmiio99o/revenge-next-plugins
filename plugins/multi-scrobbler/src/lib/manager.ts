@@ -28,6 +28,8 @@ class PluginManager {
 	private reconnectTimer?: any
 	private consecutiveFailures = 0
 	private isReconnecting = false
+	private _currentActivity?: Activity
+	private _lastUpdateTime = 0
 
 	private constructor() {
 		// singleton pattern
@@ -365,6 +367,8 @@ class PluginManager {
 			isReconnecting: this.isReconnecting,
 			lastTrackUrl: pluginState.lastTrackUrl,
 			updateInterval: this.updateTimer ? 'Active' : 'Inactive',
+			currentActivity: this._currentActivity,
+			lastUpdateTime: this._lastUpdateTime,
 		}
 	}
 }

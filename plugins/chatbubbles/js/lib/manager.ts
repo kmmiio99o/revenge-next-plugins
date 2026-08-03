@@ -1,3 +1,4 @@
+import { Dispatcher } from '@revenge-mod/discord/common/flux'
 import { configureBubbles, hookBubbles, unhookBubbles } from './bubbles'
 import { getSettings, getStorage } from './state'
 import type { PluginCleanupApi } from '@revenge-mod/plugins/types'
@@ -45,7 +46,6 @@ export function startBubbles(cleanup: PluginCleanupApi) {
 		// The `bubbles.*` bridge methods are provided by the plugin's native side.
 		await hookBubbles()
 
-		const Dispatcher = revenge.discord.common.flux.Dispatcher
 		const subs: Array<() => void> = []
 
 		for (const event of APPEARANCE_EVENTS) {

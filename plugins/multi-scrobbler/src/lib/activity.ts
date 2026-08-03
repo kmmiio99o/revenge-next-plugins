@@ -1,3 +1,4 @@
+import { Dispatcher } from '@revenge-mod/discord/common/flux'
 import Constants from '../constants'
 import { stop } from './manager'
 import { getAssetManager, getHTTPUtils } from './modules'
@@ -18,7 +19,6 @@ export function sendRequest(activity: Activity | null) {
 
 	pluginState.lastActivity = activity
 
-	const { Dispatcher } = revenge.discord.common.flux
 	Dispatcher.dispatch({
 		type: 'LOCAL_ACTIVITY_UPDATE',
 		activity: activity,

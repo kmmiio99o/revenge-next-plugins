@@ -11,14 +11,16 @@ import {
 	LOGGING_ROUTE,
 	RPC_ROUTE,
 } from './routes'
+import type { PluginApi } from '@revenge-mod/plugins/types'
 import type { MultiScrobblerStorage, ServiceType } from '../../types'
 
 export default function Settings({
 	api,
 }: {
-	api: RevengePluginStartApi<MultiScrobblerStorage>
+	api: PluginApi<{ jsonStorage: MultiScrobblerStorage }>
 }) {
-	const { Page } = revenge.components
+	const { Page } =
+		revenge.components as typeof import('@revenge-mod/components')
 	const { ScrollView } = revenge.react.ReactNative
 	const { Stack, TableRowGroup, TableRow, TableRadioGroup, TableRadioRow } =
 		revenge.discord.design.Design

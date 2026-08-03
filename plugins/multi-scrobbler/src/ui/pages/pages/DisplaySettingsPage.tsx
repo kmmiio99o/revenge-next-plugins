@@ -5,7 +5,8 @@ import { TextInputRow } from '../../components/TextInputRow'
 import type { MultiScrobblerStorage } from '../../../types'
 
 export default function DisplaySettingsPage() {
-	const { Page } = revenge.components
+	const { Page } =
+		revenge.components as typeof import('@revenge-mod/components')
 	const { ScrollView } = revenge.react.ReactNative
 	const { Stack, TableRowGroup, TableRow, Slider, Card, Text } =
 		revenge.discord.design.Design

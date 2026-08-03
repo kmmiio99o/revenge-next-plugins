@@ -25,7 +25,9 @@
 			"**/*.tsx",
 			"**/*.jsx",
 			"**/*.mjs",
-			"!**/Themelings"
+			"!**/Themelings",
+			"!**/revenge-bundle-next",
+			"!**/midroid"
 		],
 		"ignoreUnknown": true
 	},

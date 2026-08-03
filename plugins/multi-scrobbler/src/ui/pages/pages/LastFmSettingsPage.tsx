@@ -8,7 +8,8 @@ import type { MultiScrobblerStorage } from '../../../types'
 const API_KEY_URL = 'https://www.last.fm/api/account/create'
 
 export default function LastFmSettingsPage() {
-	const { Page } = revenge.components
+	const { Page } =
+		revenge.components as typeof import('@revenge-mod/components')
 	const { ScrollView } = revenge.react.ReactNative
 	const { Stack, TableRowGroup, TableRow } = revenge.discord.design.Design
 

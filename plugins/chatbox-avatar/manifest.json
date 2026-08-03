@@ -5,7 +5,7 @@
 	"description": "Quickly view your profile from the chatbox.",
 	"author": "kmmiio99o",
 	"icon": "UserSquareIcon",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"dependencies": {
 		"revenge.api": { "version": ">=1" },
 		"discord": { "version": "*" }

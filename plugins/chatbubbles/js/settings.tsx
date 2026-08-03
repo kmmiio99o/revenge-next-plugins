@@ -1,13 +1,15 @@
 import { DEFAULTS } from './defaults'
 import { colorIntToHex, openNativeColorPicker } from './lib/colorPicker'
+import type { PluginApi } from '@revenge-mod/plugins/types'
 import type { ChatBubblesStorage } from './types'
 
 export default function Settings({
 	api,
 }: {
-	api: RevengePluginStartApi<ChatBubblesStorage>
+	api: PluginApi<{ jsonStorage: ChatBubblesStorage }>
 }) {
-	const { Page } = revenge.components
+	const { Page } =
+		revenge.components as typeof import('@revenge-mod/components')
 	const { ScrollView, View } = revenge.react.ReactNative
 	const { Card, Stack, TableRowGroup, TableRow, TableSwitchRow } =
 		revenge.discord.design.Design
