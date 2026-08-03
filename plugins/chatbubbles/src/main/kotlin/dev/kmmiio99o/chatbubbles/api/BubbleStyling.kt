@@ -84,7 +84,7 @@ private fun applyBubbleBackground(viewGroup: ViewGroup, linearLayout: ViewGroup)
     val hasAccessories = viewGroup.hasChild { it.javaClass.simpleName == "MessageAccessoriesView" }
 
     if (headerVisible) {
-        linearLayout.setBubbleBackground(0, start = true, end = !hasAccessories)
+        linearLayout.setBubbleBackground(0, start = true, end = !hasAccessories, rightInset = 0)
         linearLayout.setPadding(BubbleConfig.PADDING_LARGE, BubbleConfig.PADDING_MEDIUM, 0, if (!hasAccessories) BubbleConfig.PADDING_MEDIUM else 0)
         linearLayout.translationX = -BubbleConfig.PADDING_SMALL.toFloat()
     } else {
