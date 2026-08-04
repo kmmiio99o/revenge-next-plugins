@@ -20,7 +20,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "revenge-plugin-template"
+rootProject.name = "revenge-next-plugins"
 
 // Each `plugins/<name>/` folder with Kotlin sources (`src/main`) is a native plugin module.
 // Plugins without `src/main` are JS-only and are packaged without a Gradle project.
