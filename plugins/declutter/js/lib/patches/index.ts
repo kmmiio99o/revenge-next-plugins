@@ -1,0 +1,21 @@
+import { patchAvatarDecorations } from './avatarDecorations'
+import { patchBadges } from './badges'
+import { patchNameplates } from './nameplates'
+import { patchProfileEffects } from './profileEffects'
+import { patchProfileFrames } from './profileFrames'
+import { patchServerTags } from './serverTags'
+
+export function patchAll(): () => void {
+	const unpatch: Array<() => void> = []
+
+	unpatch.push(patchAvatarDecorations())
+	unpatch.push(patchNameplates())
+	unpatch.push(patchProfileEffects())
+	unpatch.push(patchProfileFrames())
+	unpatch.push(patchServerTags())
+	unpatch.push(patchBadges())
+
+	return () => {
+		for (const un of unpatch) un?.()
+	}
+}

@@ -9,6 +9,7 @@ A collection of plugins for the [**Revenge Next**](https://github.com/revenge-mo
 | **AlwaysTrust** | Removes the untrusted link confirmation when opening external links. |
 | **Chatbox Avatar** | Adds a quick tap target in the chatbox to view your own profile — press to open your profile, long-press to open your account sheet. |
 | **Chat Bubbles** | Styles messages into chat bubbles with rounded corners and a customizable accent color, plus a rounded-square profile picture. |
+| **Declutter** | Hides profile clutter: avatar decorations, nameplates, profile effects, profile frames, server tags, and badges. |
 | **Multi Scrobbler** | Show your currently playing track from Last.fm, Libre.fm, or ListenBrainz as a rich presence activity on your Discord profile. |
 
 ---
