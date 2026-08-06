@@ -67,7 +67,9 @@ const displayNameFilter = (() => {
 	let done = false
 	return () => {
 		if (!done) {
-			value = revenge.modules.finders.filters.createFilterGenerator<[name: string]>(
+			value = revenge.modules.finders.filters.createFilterGenerator<
+				[name: string]
+			>(
 				([name], _id, exports: any) =>
 					exports?.type?.displayName === name ||
 					exports?.name === name ||
@@ -119,7 +121,9 @@ const avatar = createModuleGetter<any>(
 // modules/user_profile/native/showUserProfileActionSheet.tsx (module 8706)
 // Exports: { default: showUserProfileActionSheet, getUserProfileActionSheetKey, ... }
 const profileSheetFn = createModuleGetter<any>(
-	revenge.modules.finders.filters.withProps('showUserProfileActionSheetPostConnection'),
+	revenge.modules.finders.filters.withProps(
+		'showUserProfileActionSheetPostConnection',
+	),
 	exports => {
 		if (typeof exports === 'function') return exports
 		if (typeof exports?.default === 'function') return exports.default
@@ -143,7 +147,9 @@ const accountSheetFn = createModuleGetter<any>(
 // modules/user_profile/native/UserProfileCustomStatusActionSheet.tsx (module 9384)
 // Exports: { default: UserProfileCustomStatusActionSheet }
 const customStatusSheetFn = createModuleGetter<any>(
-	revenge.modules.finders.filters.withName('UserProfileCustomStatusActionSheet'),
+	revenge.modules.finders.filters.withName(
+		'UserProfileCustomStatusActionSheet',
+	),
 	exports => {
 		if (typeof exports === 'function') return exports
 		if (typeof exports?.default === 'function') return exports.default
@@ -227,7 +233,7 @@ export function forceLoadLazySheets(): void {
 	}
 }
 
-export function openAccountSheet(userId: string, channelId?: string) {
+export function openAccountSheet(_userId: string, _channelId?: string) {
 	try {
 		forceLoadLazySheets()
 		const fn = accountSheetFn()

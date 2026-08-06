@@ -1,4 +1,6 @@
+import { Pressable } from 'react-native'
 import { DEFAULTS } from '../defaults'
+import { getStorage } from '../lib/state'
 import {
 	forceLoadLazySheets,
 	getAvatar,
@@ -12,9 +14,7 @@ import {
 	isComponentType,
 	openAccountSheet,
 } from './modules'
-import { getStorage } from '../lib/state'
 import type { ChatboxAvatarStorage } from '../types'
-import { Pressable } from 'react-native'
 
 export default function AvatarAction() {
 	const { React } = revenge.react
@@ -55,12 +55,16 @@ export default function AvatarAction() {
 	}
 
 	const guildId = s.profileType === 'server' ? channel?.guild_id : undefined
-	const profileChannelId = s.profileType === 'server' ? (channel?.id ?? channelId) : undefined
+	const profileChannelId =
+		s.profileType === 'server' ? (channel?.id ?? channelId) : undefined
 
 	const openProfileSheet = () => {
 		try {
 			forceLoadLazySheets()
-			getShowUserProfileActionSheet()?.({ userId: self.id, channelId: profileChannelId })
+			getShowUserProfileActionSheet()?.({
+				userId: self.id,
+				channelId: profileChannelId,
+			})
 		} catch {}
 	}
 
