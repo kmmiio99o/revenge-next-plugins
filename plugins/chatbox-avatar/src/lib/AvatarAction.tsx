@@ -1,5 +1,6 @@
 import { DEFAULTS } from '../defaults'
 import {
+	forceLoadLazySheets,
 	getAvatar,
 	getChannelStore,
 	getHapticFeedbackTypes,
@@ -11,12 +12,13 @@ import {
 	isComponentType,
 	openAccountSheet,
 } from './modules'
-import { getStorage } from './state'
+import { getStorage } from '../lib/state'
+import type { ChatboxAvatarStorage } from '../types'
+import { Pressable } from 'react-native'
 
 export default function AvatarAction() {
 	const { React } = revenge.react
 	const { useReRender } = revenge.utils.react
-	const { Pressable } = revenge.react.ReactNative
 
 	const forceUpdate = useReRender()
 
@@ -34,7 +36,7 @@ export default function AvatarAction() {
 	}, [forceUpdate])
 
 	const jsonStorage = getStorage()
-	const s = { ...DEFAULTS, ...(jsonStorage?.use() ?? {}) }
+	const s: ChatboxAvatarStorage = { ...DEFAULTS, ...(jsonStorage?.use() ?? {}) }
 
 	const self = getUserStore()?.getCurrentUser?.()
 	const status = getSelfPresenceStore()?.getStatus?.()
@@ -53,18 +55,13 @@ export default function AvatarAction() {
 	}
 
 	const guildId = s.profileType === 'server' ? channel?.guild_id : undefined
-	const profileChannelId =
-		s.profileType === 'server' ? (channel?.id ?? channelId) : undefined
+	const profileChannelId = s.profileType === 'server' ? (channel?.id ?? channelId) : undefined
 
 	const openProfileSheet = () => {
 		try {
-			getShowUserProfileActionSheet()?.({
-				userId: self.id,
-				channelId: profileChannelId,
-			})
-		} catch {
-			// ignore
-		}
+			forceLoadLazySheets()
+			getShowUserProfileActionSheet()?.({ userId: self.id, channelId: profileChannelId })
+		} catch {}
 	}
 
 	const handlePress = () => {
@@ -76,8 +73,10 @@ export default function AvatarAction() {
 	}
 
 	const handleLongPress = () => {
-		const types = getHapticFeedbackTypes()
-		getTriggerHapticFeedback()?.(types?.SELECTION)
+		try {
+			const types = getHapticFeedbackTypes()
+			getTriggerHapticFeedback()?.(types?.SOFT)
+		} catch {}
 		if (s.longPressAction === 'server') {
 			openAccountSheet(self.id, channel?.id ?? channelId)
 		} else {
@@ -85,10 +84,15 @@ export default function AvatarAction() {
 		}
 	}
 
+	const hitSlop = Math.max(0, (48 - 36) / 2)
+
 	return (
 		<Pressable
 			onPress={handlePress}
 			onLongPress={handleLongPress}
+			delayLongPress={500}
+			hitSlop={hitSlop}
+			accessibilityRole="button"
 			style={{
 				justifyContent: 'center',
 				alignItems: 'center',

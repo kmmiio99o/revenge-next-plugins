@@ -1,35 +1,88 @@
-function lazy<T>(resolve: () => T): () => T {
-	let value: T
+function createModuleGetter<T>(
+	filter: any,
+	resolve: (exports: any) => T | undefined,
+): () => T | undefined {
+	const { getModules, lookupModule } = revenge.modules.finders
+
+	let cached: T | undefined
+	let done = false
+	let unsub: (() => void) | undefined
+
+	try {
+		unsub = getModules(filter, (exports: any) => {
+			try {
+				const resolved = resolve(exports)
+				if (resolved !== undefined) {
+					cached = resolved
+					done = true
+					unsub?.()
+				}
+			} catch {}
+		})
+	} catch {}
+
+	return () => {
+		if (done) return cached
+		try {
+			const resolved = resolve(lookupModule(filter)?.[0])
+			if (resolved !== undefined) {
+				cached = resolved
+				done = true
+			}
+		} catch {}
+		return cached
+	}
+}
+
+function createStoreGetter(name: string): () => any {
+	const { getStore, Stores } = revenge.discord.flux
+
+	let cached: any
+	let done = false
+	let unsub: (() => void) | undefined
+
+	try {
+		unsub = getStore(name, (store: any) => {
+			cached = store
+			done = true
+			unsub?.()
+		})
+	} catch {}
+
+	return () => {
+		if (done) return cached
+		try {
+			const viaProxy = (Stores as any)[name]
+			if (viaProxy) {
+				cached = viaProxy
+				done = true
+			}
+		} catch {}
+		return cached
+	}
+}
+
+const displayNameFilter = (() => {
+	let value: any
 	let done = false
 	return () => {
 		if (!done) {
-			value = resolve()
+			value = revenge.modules.finders.filters.createFilterGenerator<[name: string]>(
+				([name], _id, exports: any) =>
+					exports?.type?.displayName === name ||
+					exports?.name === name ||
+					exports?.default?.type?.displayName === name ||
+					exports?.default?.name === name,
+				([name]) => `revenge.displayName(${name})`,
+				revenge.modules.finders.filters.FilterFlag.RequiresExports,
+				revenge.modules.finders.filters.FilterScopes.Initialized,
+			)
 			done = true
 		}
 		return value
 	}
-}
+})()
 
-// ChatInputActions/ChatInputSendButton have no `exports.name` (they're `export default memo(...)`),
-// so the stock `withName` can't match them. This matches on the component's `displayName` instead,
-// wherever it lives (namespace, default export, or `.type` wrapper). A bare predicate won't work
-// because `runFilter` needs `key`/`flags`/`scopes` for caching, hence `createFilterGenerator`.
-const displayNameFilter = lazy(() =>
-	revenge.modules.finders.filters.createFilterGenerator<[name: string]>(
-		([name], _id, exports: any) =>
-			exports?.type?.displayName === name ||
-			exports?.name === name ||
-			exports?.default?.type?.displayName === name ||
-			exports?.default?.name === name,
-		([name]) => `revenge.displayName(${name})`,
-		revenge.modules.finders.filters.FilterFlag.RequiresExports,
-		revenge.modules.finders.filters.FilterScopes.Initialized,
-	),
-)
-
-// Resolve the actual React component (function/memo/forwardRef) from a module namespace.
-// The chat input components are `export default memo(forwardRef(...))`; patch the memo object
-// itself, not its `.type` (the inner forwardRef, which React never instantiates).
 export function isComponentType(v: any): boolean {
 	if (typeof v === 'function') return true
 	if (v && typeof v === 'object') {
@@ -52,159 +105,71 @@ export function resolveComponent(exports: any): any {
 	return undefined
 }
 
-// Avatar module exports `{ default: Avatar, AvatarSizes, getStatusSize }`. The `default` prop is
-// required to disambiguate from "getAvatarSpecs", a constants module that also exports
-// AvatarSizes + getStatusSize but no component.
-const avatar = lazy<any>(() => {
-	const finders = revenge.modules.finders
-	const filters = finders.filters
-
-	const withSizes = finders.lookupModule<any>(
-		filters.withProps('AvatarSizes', 'getStatusSize', 'default'),
-	)?.[0]
-	if (withSizes) return withSizes
-
-	return finders.lookupModule<any>(
-		filters.withProps('AvatarSizes', 'getStatusSize'),
-	)?.[0]
-})
-
-// Flux stores via the Stores proxy; read per call, never at module scope.
-const userStore = lazy(() => (revenge.discord.flux.Stores as any).UserStore)
-const selfPresenceStore = lazy(
-	() => (revenge.discord.flux.Stores as any).SelfPresenceStore,
-)
-const selectedChannelStore = lazy(
-	() => (revenge.discord.flux.Stores as any).SelectedChannelStore,
-)
-const channelStore = lazy(
-	() => (revenge.discord.flux.Stores as any).ChannelStore,
+// design/void/Avatar/native/Avatar.tsx (module 13273)
+// Exports: { default: Avatar, AvatarSizes, getStatusSize }
+const avatar = createModuleGetter<any>(
+	revenge.modules.finders.filters.withProps(
+		'default',
+		'AvatarSizes',
+		'getStatusSize',
+	),
+	exports => resolveComponent(exports),
 )
 
-// The action-sheet functions are LAZY modules: they only run once the app opens a user profile /
-// "you" screen. So on a fresh session `withName`/`withProps` (RequiresExports + Initialized scope)
-// can never match them, and `lazy()` would permanently cache that miss. Mirroring the client's own
-// finders, we AND the export filter with `withDependencies`: its exportsless scope can match an
-// uninitialized module by dep map, force-initialize it, then re-check real exports. Only success
-// is cached; a miss retries on the next press.
-//
-// Dep maps come from the bundle's `__d(...)` registrations (the decompiled `import` statements are
-// reordered and don't match):
-//   showUserProfileActionSheet (module 8363): [5, 6697, 3830, ...]  -> loose([5, 6697, 3830])
-//   showYouAccountActionSheet (module 15265): [15266, 4161, ...]    -> loose([15266, 4161])
-let profileSheetFn: any
-let accountSheetFn: any
-let sheetBackstop: (() => void) | undefined
-
-// Safety net for dep-map drift: `getModules` fires immediately if the module is already
-// initialized, otherwise when the app initializes it later.
-function registerSheetBackstop() {
-	if (sheetBackstop) return
-	const finders = revenge.modules.finders
-	const filters = finders.filters
-	sheetBackstop = () => {
-		finders.getModules(
-			filters.withName('showUserProfileActionSheet'),
-			exports => {
-				profileSheetFn = exports
-			},
-		)
-		finders.getModules(
-			filters.withProps('showYouAccountActionSheet'),
-			exports => {
-				accountSheetFn = exports?.showYouAccountActionSheet
-			},
-		)
-	}
-	sheetBackstop()
-}
-
-function resolveProfileSheet(): any {
-	if (profileSheetFn) return profileSheetFn
-	const finders = revenge.modules.finders
-	const filters = finders.filters
-	let exports: any
-	try {
-		const result = finders.lookupModule<any>(
-			filters
-				.withName('showUserProfileActionSheet')
-				.and(
-					filters.withDependencies(
-						filters.withDependencies.loose([5, 6697, 3830]),
-					),
-				),
-		)
-		exports = result?.[0]
-	} catch {
+// modules/user_profile/native/showUserProfileActionSheet.tsx (module 8706)
+// Exports: { default: showUserProfileActionSheet, getUserProfileActionSheetKey, ... }
+const profileSheetFn = createModuleGetter<any>(
+	revenge.modules.finders.filters.withProps('showUserProfileActionSheetPostConnection'),
+	exports => {
+		if (typeof exports === 'function') return exports
+		if (typeof exports?.default === 'function') return exports.default
+		if (typeof exports?.showUserProfileActionSheet === 'function') {
+			return exports.showUserProfileActionSheet
+		}
 		return undefined
-	}
-	if (typeof exports === 'function') {
-		profileSheetFn = exports
-		return exports
-	}
-	return undefined
-}
+	},
+)
 
-function resolveAccountSheet(): any {
-	if (accountSheetFn) return accountSheetFn
-	const finders = revenge.modules.finders
-	const filters = finders.filters
-	let exports: any
-	try {
-		const result = finders.lookupModule<any>(
-			filters
-				.withProps('showYouAccountActionSheet')
-				.and(
-					filters.withDependencies(
-						filters.withDependencies.loose([15266, 4161]),
-					),
-				),
-		)
-		exports = result?.[0]
-	} catch {
+// modules/main_tabs_v2/native/tabs/you/utils/showYouAccountActionSheet.tsx (module 15381)
+// Exports: { showYouAccountActionSheet }
+const accountSheetFn = createModuleGetter<any>(
+	revenge.modules.finders.filters.withProps('showYouAccountActionSheet'),
+	exports =>
+		typeof exports?.showYouAccountActionSheet === 'function'
+			? exports.showYouAccountActionSheet
+			: undefined,
+)
+
+// modules/user_profile/native/UserProfileCustomStatusActionSheet.tsx (module 9384)
+// Exports: { default: UserProfileCustomStatusActionSheet }
+const customStatusSheetFn = createModuleGetter<any>(
+	revenge.modules.finders.filters.withName('UserProfileCustomStatusActionSheet'),
+	exports => {
+		if (typeof exports === 'function') return exports
+		if (typeof exports?.default === 'function') return exports.default
 		return undefined
-	}
-	const fn = exports?.showYouAccountActionSheet
-	if (typeof fn === 'function') {
-		accountSheetFn = fn
-		return fn
-	}
-	return undefined
-}
+	},
+)
 
-// Discord's haptics helper (module 4162, "modules/haptics/HapticUtils.native.tsx"):
-// deps [4163, 4164, 500, 4173, 2] -> loose([4163, 4164]). Exposes `triggerHapticFeedback`
-// (a `HapticFeedbackTypes` constant arg) and the `HapticFeedbackTypes` enum.
-let hapticsFn: any
-let hapticsTypes: any
+// modules/haptics/HapticUtils.native.tsx (module 4254)
+// Exports: { HapticFeedbackTypes, triggerHapticFeedback }
+const hapticsFn = createModuleGetter<any>(
+	revenge.modules.finders.filters.withProps('triggerHapticFeedback'),
+	exports =>
+		typeof exports?.triggerHapticFeedback === 'function'
+			? exports.triggerHapticFeedback
+			: undefined,
+)
 
-function resolveHaptics(): any {
-	if (hapticsFn) return hapticsFn
-	const finders = revenge.modules.finders
-	const filters = finders.filters
-	let exports: any
-	try {
-		const result = finders.lookupModule<any>(
-			filters
-				.withProps('triggerHapticFeedback')
-				.and(
-					filters.withDependencies(
-						filters.withDependencies.loose([4163, 4164]),
-					),
-				),
-		)
-		exports = result?.[0]
-	} catch {
-		return undefined
-	}
-	const fn = exports?.triggerHapticFeedback
-	if (typeof fn === 'function') {
-		hapticsFn = fn
-		hapticsTypes = exports?.HapticFeedbackTypes
-		return fn
-	}
-	return undefined
-}
+const hapticsTypes = createModuleGetter<any>(
+	revenge.modules.finders.filters.withProps('triggerHapticFeedback'),
+	exports => exports?.HapticFeedbackTypes ?? exports?.default,
+)
+
+const userStore = createStoreGetter('UserStore')
+const selfPresenceStore = createStoreGetter('SelfPresenceStore')
+const selectedChannelStore = createStoreGetter('SelectedChannelStore')
+const channelStore = createStoreGetter('ChannelStore')
 
 export function getDisplayNameFilter(name: string) {
 	return displayNameFilter()(name)
@@ -213,55 +178,72 @@ export function getDisplayNameFilter(name: string) {
 export function getAvatar(): any {
 	return avatar()
 }
-
 export function getAvatarSizes(): any {
 	return avatar()?.AvatarSizes
 }
-
 export function getUserStore(): any {
 	return userStore()
 }
-
 export function getSelfPresenceStore(): any {
 	return selfPresenceStore()
 }
-
 export function getSelectedChannelStore(): any {
 	return selectedChannelStore()
 }
-
 export function getChannelStore(): any {
 	return channelStore()
 }
 
 export function getShowUserProfileActionSheet(): any {
-	registerSheetBackstop()
-	return resolveProfileSheet()
+	return profileSheetFn()
 }
-
 export function getShowYouAccountActionSheet(): any {
-	registerSheetBackstop()
-	return resolveAccountSheet()
+	return accountSheetFn()
 }
-
+export function getShowCustomStatusActionSheet(): any {
+	return customStatusSheetFn()
+}
 export function getTriggerHapticFeedback(): any {
-	return resolveHaptics()
+	return hapticsFn()
+}
+export function getHapticFeedbackTypes(): any {
+	return hapticsTypes()
 }
 
-export function getHapticFeedbackTypes(): any {
-	resolveHaptics()
-	return hapticsTypes
+let lazySheetsLoaded = false
+
+export function forceLoadLazySheets(): void {
+	if (lazySheetsLoaded) return
+	lazySheetsLoaded = true
+	const requireFn = (globalThis as any)?.__r
+	if (typeof requireFn !== 'function') return
+	// modules/user_profile/native/showUserProfileActionSheet.tsx
+	// modules/main_tabs_v2/native/tabs/you/utils/showYouAccountActionSheet.tsx
+	// modules/user_profile/native/UserProfileCustomStatusActionSheet.tsx
+	for (const id of [8706, 15381, 9384]) {
+		try {
+			requireFn(id)
+		} catch {}
+	}
 }
 
 export function openAccountSheet(userId: string, channelId?: string) {
 	try {
-		const fn = getShowYouAccountActionSheet()
+		forceLoadLazySheets()
+		const fn = accountSheetFn()
 		if (typeof fn === 'function') {
 			fn(false, true)
-			return
 		}
-	} catch {
-		// fall through to showUserProfileActionSheet
-	}
-	getShowUserProfileActionSheet()?.({ userId, channelId })
+	} catch {}
+}
+
+export function openCustomStatusSheet(
+	userId: string,
+	guildId?: string,
+	channelId?: string,
+) {
+	try {
+		forceLoadLazySheets()
+		customStatusSheetFn()?.({ user: { id: userId, guildId, channelId } })
+	} catch {}
 }
