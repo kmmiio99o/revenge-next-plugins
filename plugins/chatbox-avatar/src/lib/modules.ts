@@ -107,7 +107,7 @@ export function resolveComponent(exports: any): any {
 	return undefined
 }
 
-// design/void/Avatar/native/Avatar.tsx (module 13273)
+// design/void/Avatar/native/Avatar.tsx (module 13295)
 // Exports: { default: Avatar, AvatarSizes, getStatusSize }
 const avatar = createModuleGetter<any>(
 	revenge.modules.finders.filters.withProps(
@@ -118,7 +118,7 @@ const avatar = createModuleGetter<any>(
 	exports => resolveComponent(exports),
 )
 
-// modules/user_profile/native/showUserProfileActionSheet.tsx (module 8706)
+// modules/user_profile/native/showUserProfileActionSheet.tsx (module 8723)
 // Exports: { default: showUserProfileActionSheet, getUserProfileActionSheetKey, ... }
 const profileSheetFn = createModuleGetter<any>(
 	revenge.modules.finders.filters.withProps(
@@ -134,7 +134,7 @@ const profileSheetFn = createModuleGetter<any>(
 	},
 )
 
-// modules/main_tabs_v2/native/tabs/you/utils/showYouAccountActionSheet.tsx (module 15381)
+// modules/main_tabs_v2/native/tabs/you/utils/showYouAccountActionSheet.tsx (module 15405)
 // Exports: { showYouAccountActionSheet }
 const accountSheetFn = createModuleGetter<any>(
 	revenge.modules.finders.filters.withProps('showYouAccountActionSheet'),
@@ -144,7 +144,7 @@ const accountSheetFn = createModuleGetter<any>(
 			: undefined,
 )
 
-// modules/user_profile/native/UserProfileCustomStatusActionSheet.tsx (module 9384)
+// modules/user_profile/native/UserProfileCustomStatusActionSheet.tsx (module 9401)
 // Exports: { default: UserProfileCustomStatusActionSheet }
 const customStatusSheetFn = createModuleGetter<any>(
 	revenge.modules.finders.filters.withName(
@@ -157,7 +157,7 @@ const customStatusSheetFn = createModuleGetter<any>(
 	},
 )
 
-// modules/haptics/HapticUtils.native.tsx (module 4254)
+// modules/haptics/HapticUtils.native.tsx (module 4271)
 // Exports: { HapticFeedbackTypes, triggerHapticFeedback }
 const hapticsFn = createModuleGetter<any>(
 	revenge.modules.finders.filters.withProps('triggerHapticFeedback'),
@@ -216,21 +216,95 @@ export function getHapticFeedbackTypes(): any {
 	return hapticsTypes()
 }
 
+// Stable dependency anchors that survived the last Discord build update
+const DEP_USER_STORE = 1903
+const DEP_ASYNC_REQUIRE_IMPL = 1988
+
+// Current-build module IDs, used as a direct fallback when the
+// dependency-anchored lookup above can't resolve a module.
+const LAZY_SHEET_IDS = [8723, 15405, 9401]
+
 let lazySheetsLoaded = false
 
 export function forceLoadLazySheets(): void {
 	if (lazySheetsLoaded) return
-	lazySheetsLoaded = true
-	const requireFn = (globalThis as any)?.__r
-	if (typeof requireFn !== 'function') return
-	// modules/user_profile/native/showUserProfileActionSheet.tsx
-	// modules/main_tabs_v2/native/tabs/you/utils/showYouAccountActionSheet.tsx
-	// modules/user_profile/native/UserProfileCustomStatusActionSheet.tsx
-	for (const id of [8706, 15381, 9384]) {
+
+	const { lookupModule } = revenge.modules.finders
+	const { withDependencies, withName, withProps } =
+		revenge.modules.finders.filters
+	const { relative } = withDependencies
+
+	// Dependency-anchored force-init that survives module ID drift between
+	// builds. `withDependencies` can match uninitialized modules (Dynamic
+	// flag, Uninitialized scope) while the anchored props/name check rejects
+	// wrong candidates, so only the intended module gets initialized.
+	// `relative(+n)` matches a dependency that sits `n` modules after the
+	// module itself, which holds for the sibling modules Discord bundles
+	// alongside each action sheet.
+	const forceInit = (filter: any) => {
 		try {
-			requireFn(id)
+			lookupModule(filter, { initialize: true })
 		} catch {}
 	}
+
+	// modules/user_profile/native/showUserProfileActionSheet.tsx (module 8723)
+	forceInit(
+		withDependencies([
+			null,
+			null,
+			null,
+			DEP_USER_STORE,
+			DEP_ASYNC_REQUIRE_IMPL,
+			null,
+			null,
+			null,
+			null,
+			2,
+		]).and(withProps('showUserProfileActionSheetPostConnection')),
+	)
+
+	// modules/main_tabs_v2/native/tabs/you/utils/showYouAccountActionSheet.tsx (module 15405)
+	forceInit(
+		withDependencies([
+			relative(1),
+			null,
+			relative(2),
+			DEP_ASYNC_REQUIRE_IMPL,
+			2,
+		]).and(withProps('showYouAccountActionSheet')),
+	)
+
+	// modules/user_profile/native/UserProfileCustomStatusActionSheet.tsx (module 9401)
+	forceInit(
+		withDependencies([
+			null,
+			null,
+			DEP_USER_STORE,
+			null,
+			null,
+			null,
+			null,
+			null,
+			relative(1),
+			null,
+			null,
+			relative(2),
+			null,
+			null,
+			2,
+		]).and(withName('UserProfileCustomStatusActionSheet')),
+	)
+
+	const requireFn = (globalThis as any)?.__r
+	if (typeof requireFn === 'function') {
+		for (const id of LAZY_SHEET_IDS) {
+			try {
+				requireFn(id)
+			} catch {}
+		}
+	}
+
+	lazySheetsLoaded = true
 }
 
 export function openAccountSheet(_userId: string, _channelId?: string) {
