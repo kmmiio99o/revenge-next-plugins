@@ -15,7 +15,6 @@ export function patchYouDock(): () => void {
 
 	unpatch.push(
 		onImportedPath<any>('modules/quests/native/QuestDock/QuestDock.tsx', ns => {
-			console.log('[Declutter] patched QuestDock:', Object.keys(ns))
 			const dock = resolveComponent(ns)
 			if (!dock) return
 			unpatch.push(
@@ -31,7 +30,6 @@ export function patchYouDock(): () => void {
 		onImportedPath<any>(
 			'modules/main_tabs_v2/native/tabs/you/YouScreenNavIcon.tsx',
 			ns => {
-				console.log('[Declutter] patched YouScreenNavIcon:', Object.keys(ns))
 				const icon = resolveComponent(ns)
 				if (!icon) return
 				unpatch.push(
@@ -55,10 +53,6 @@ export function patchYouDock(): () => void {
 		onImportedPath<any>(
 			'modules/collectibles/native/CollectiblesShopEntryButton.tsx',
 			ns => {
-				console.log(
-					'[Declutter] patched CollectiblesShopEntryButton:',
-					Object.keys(ns),
-				)
 				const button = resolveComponent(ns)
 				if (!button) return
 				unpatch.push(
@@ -77,10 +71,6 @@ export function patchYouDock(): () => void {
 		onImportedPath<any>(
 			'modules/main_tabs_v2/native/tabs/you/YouScreenNavIconNitroSubscriber.tsx',
 			ns => {
-				console.log(
-					'[Declutter] patched YouScreenNavIconNitroSubscriber:',
-					Object.keys(ns),
-				)
 				const button = resolveComponent(ns)
 				if (!button) return
 				unpatch.push(
@@ -102,7 +92,6 @@ export function patchYouDock(): () => void {
 		onImportedPath<any>(
 			'modules/virtual_currency/native/BalanceWidgetMenu.tsx',
 			ns => {
-				console.log('[Declutter] patched BalanceWidgetMenu:', Object.keys(ns))
 				const menu = resolveComponent(ns)
 				if (!menu) return
 				unpatch.push(

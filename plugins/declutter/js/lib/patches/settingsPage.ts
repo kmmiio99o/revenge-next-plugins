@@ -30,7 +30,6 @@ export function patchSettingsPage(): () => void {
 		onImportedPath<any>(
 			'modules/settings/native/renderer/SettingTreeManager.tsx',
 			ns => {
-				console.log('[Declutter] patched SettingTreeManager:', Object.keys(ns))
 				const manager = ns?.default
 				if (!manager || typeof manager.isBlocked !== 'function') return
 				unpatch.push(
