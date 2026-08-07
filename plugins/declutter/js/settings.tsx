@@ -88,6 +88,50 @@ export default function Settings({
 							subLabel="Badges shown on user profiles"
 						/>
 					</TableRowGroup>
+					<TableRowGroup title="Nitro">
+						<Toggle
+							s={s}
+							set={set}
+							key_="questDock"
+							label="Quest Dock"
+							subLabel="Floating quest bar at bottom of app"
+						/>
+						<Toggle
+							s={s}
+							set={set}
+							key_="youTabQuestsButton"
+							label="Quests Button (YouTab bar)"
+							subLabel="Quests icon on the YouTab floating bar"
+						/>
+						<Toggle
+							s={s}
+							set={set}
+							key_="youTabShopButton"
+							label="Shop Button (YouTab bar)"
+							subLabel="Shop icon on the YouTab floating bar"
+						/>
+						<Toggle
+							s={s}
+							set={set}
+							key_="youTabNitroButton"
+							label="Nitro Button (YouTab bar)"
+							subLabel="Nitro icon on the YouTab floating bar"
+						/>
+						<Toggle
+							s={s}
+							set={set}
+							key_="youTabOrbsBalance"
+							label="Orbs Balance (YouScreen)"
+							subLabel="Orbs balance bar above the bio on your profile"
+						/>
+						<Toggle
+							s={s}
+							set={set}
+							key_="premiumSettings"
+							label="Nitro / Payment Settings (User Settings)"
+							subLabel="Hides the whole Nitro/Payment settings category in User Settings"
+						/>
+					</TableRowGroup>
 				</Stack>
 			</ScrollView>
 		</Page>

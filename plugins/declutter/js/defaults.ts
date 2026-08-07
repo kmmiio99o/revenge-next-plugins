@@ -7,4 +7,10 @@ export const DEFAULTS: DeclutterSettings = {
 	profileFrames: true,
 	serverTags: true,
 	badges: true,
+	questDock: true,
+	youTabQuestsButton: true,
+	youTabShopButton: true,
+	youTabNitroButton: true,
+	youTabOrbsBalance: true,
+	premiumSettings: true,
 }

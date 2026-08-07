@@ -2,7 +2,7 @@
 	"format": 1,
 	"id": "dev.kmmiio99o.declutter",
 	"name": "Declutter",
-	"description": "Hide profile clutter: avatar decorations, nameplates, profile effects, profile frames, server tags, and badges.",
+	"description": "Hide profile clutter: avatar decorations, nameplates, profile effects, profile frames, server tags, and badges. Aswell as Nitro/Payment settings.",
 	"author": "kmmiio99o",
 	"icon": "SlashIcon",
 	"version": "1.0.0",

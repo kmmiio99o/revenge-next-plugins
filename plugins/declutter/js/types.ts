@@ -11,4 +11,16 @@ export interface DeclutterSettings {
 	serverTags: boolean
 	/** Hide badges shown on user profiles */
 	badges: boolean
+	/** Hide Quest dock (floating quest bar at bottom) */
+	questDock: boolean
+	/** Hide Quests button on YouTab floating bar */
+	youTabQuestsButton: boolean
+	/** Hide Shop button on YouTab floating bar */
+	youTabShopButton: boolean
+	/** Hide Nitro button on YouTab floating bar */
+	youTabNitroButton: boolean
+	/** Hide the Orbs balance bar on the YouScreen profile */
+	youTabOrbsBalance: boolean
+	/** Hide the whole Nitro/Payment category in User Settings */
+	premiumSettings: boolean
 }

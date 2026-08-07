@@ -4,6 +4,8 @@ import { patchNameplates } from './nameplates'
 import { patchProfileEffects } from './profileEffects'
 import { patchProfileFrames } from './profileFrames'
 import { patchServerTags } from './serverTags'
+import { patchSettingsPage } from './settingsPage'
+import { patchYouDock } from './youDock'
 
 export function patchAll(): () => void {
 	const unpatch: Array<() => void> = []
@@ -14,6 +16,8 @@ export function patchAll(): () => void {
 	unpatch.push(patchProfileFrames())
 	unpatch.push(patchServerTags())
 	unpatch.push(patchBadges())
+	unpatch.push(patchSettingsPage())
+	unpatch.push(patchYouDock())
 
 	return () => {
 		for (const un of unpatch) un?.()
