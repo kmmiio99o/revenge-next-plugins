@@ -5,7 +5,7 @@
 	"description": "Adds customizable chat bubbles to the chat, similar to Flowercord.",
 	"author": "kmmiio99o",
 	"icon": "ChatIcon",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"dependencies": {
 		"revenge.api": { "version": ">=1" },
 		"discord": { "version": "*" }

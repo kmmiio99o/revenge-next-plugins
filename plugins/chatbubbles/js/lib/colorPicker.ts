@@ -2,41 +2,58 @@ import { getSettings } from './state'
 
 let showCustomColorPicker: any
 
-// `showCustomColorPickerActionSheet` is a LAZY module: on a fresh session its exports
-// don't exist until the first color picker is opened somewhere in the app, so `withName`
-// alone (RequiresExports + Initialized scope) can never match it. Mirroring the client's
-// own finders (same trick as chatbox-avatar's action sheets), we AND the export filter
-// with `withDependencies`: its exportsless scope matches the uninitialized module by dep
-// map, force-initializes it, then re-checks the real exports. Only success is cached.
+// `showCustomColorPickerActionSheet` is registered in the main bundle at startup but NOT
+// initialized on a fresh session: its only importers are async profile-editor / role-color
+// screens, so on a cold start its exports don't exist and `withName` (Initialized scope)
+// alone can never match it.
+//
+// The launcher is one of Discord's `openLazy` action-sheet wrappers. Every such wrapper is
+// produced by the same codegen, so its dependency map always starts with
+//
+//   [ ActionSheetActionCreators, <own function id> ]
+//
+// where the own function id is always module ID + 1 (`relative(1)`) and
+// ActionSheetActionCreators always exposes the stable `openLazy` export. No module IDs are
+// hardcoded anywhere in this resolver: the only drifting dependency (ActionSheetActionCreators)
+// is located by its export names at runtime and the self-reference is structural, so the
+// lookup survives Discord renumbering every module on every update.
+//
+// `withDependencies` runs in the exportsless scope, so it matches the still-uninitialized
+// launcher and forces it to initialize; `withName` then confirms the real exports. Only
+// success is cached.
 function resolveShowCustomColorPicker(): any {
 	if (typeof showCustomColorPicker === 'function') return showCustomColorPicker
 
 	const finders = revenge.modules.finders
 	const filters = finders.filters
 
+	// Locate ActionSheetActionCreators by its stable exports — its ID drifts on every build,
+	// the export names don't. If it's somehow not initialized yet, fall back to a dynamic
+	// dependency (`null`) and let `withName` disambiguate below.
+	const actionSheetCreatorId = finders.lookupModule(
+		filters.withProps('openLazy', 'hideActionSheet'),
+	)?.[1]
+	const actionSheetCreatorDep: number | null =
+		typeof actionSheetCreatorId === 'number' ? actionSheetCreatorId : null
+
 	let exports: any
 	try {
-		const found = finders.lookupModule<any>(
+		const found = finders.lookupModule(
 			filters
 				.withName('showCustomColorPickerActionSheet')
 				.and(
 					filters.withDependencies(
-						filters.withDependencies.loose([4161, 13715]),
+						filters.withDependencies.loose([
+							actionSheetCreatorDep,
+							filters.withDependencies.relative(1),
+						]),
 					),
 				),
+			{ initialize: true },
 		)
 		exports = found?.[0]
 	} catch {
-		// fall through to the initialized-only lookup
-	}
-
-	if (typeof exports !== 'function') {
-		try {
-			const found = finders.lookupModule<any>(
-				filters.withName('showCustomColorPickerActionSheet'),
-			)
-			exports = found?.[0]
-		} catch {}
+		// leave undefined → openNativeColorPicker no-ops
 	}
 
 	if (typeof exports === 'function') {
@@ -55,7 +72,7 @@ export function colorIntToHex(color: number): string {
 /**
  * Open Discord's native color picker. Calls `onSelect` with the chosen color as a
  * `0xAARRGGBB` int (alpha forced to `0xFF`). No-ops if the picker module can't be
- * resolved (e.g. bundle drift).
+ * resolved.
  *
  * The picker itself works in 24-bit RGB: its `onSelect`/`color` values carry no alpha
  * (`num()` in the bundled color lib drops it), so we strip alpha on the way in and
