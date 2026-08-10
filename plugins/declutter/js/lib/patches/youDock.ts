@@ -47,7 +47,7 @@ export function patchYouDock(): () => void {
 				)
 			},
 		),
-  )
+	)
 
 	unpatch.push(
 		onImportedPath<any>(

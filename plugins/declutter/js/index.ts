@@ -33,5 +33,11 @@ export default plugin<{ jsonStorage: DeclutterSettings }>({
 			plugin.requireReload()
 		}
 	},
+	// The same caching that delays the enabled state also delays the disabled state: hidden
+	// clutter (avatar decorations, nameplates, ...) stays parsed on already-cached records,
+	// so disabling or uninstalling the plugin only fully applies after a reload.
+	stop() {
+		this.requireReload()
+	},
 	SettingsComponent: Settings,
 })
