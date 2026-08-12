@@ -70,13 +70,12 @@ const displayNameFilter = (() => {
 			value = revenge.modules.finders.filters.createFilterGenerator<
 				[name: string]
 			>(
-				([name], _id, exports: any) =>
+				([name], _id, exports: any, _initialized: boolean) =>
 					exports?.type?.displayName === name ||
 					exports?.name === name ||
 					exports?.default?.type?.displayName === name ||
 					exports?.default?.name === name,
 				([name]) => `revenge.displayName(${name})`,
-				revenge.modules.finders.filters.FilterFlag.RequiresExports,
 				revenge.modules.finders.filters.FilterScopes.Initialized,
 			)
 			done = true
@@ -216,13 +215,8 @@ export function getHapticFeedbackTypes(): any {
 	return hapticsTypes()
 }
 
-// Stable dependency anchors that survived the last Discord build update
-const DEP_USER_STORE = 1903
-const DEP_ASYNC_REQUIRE_IMPL = 1988
-
-// Current-build module IDs, used as a direct fallback when the
-// dependency-anchored lookup above can't resolve a module.
-const LAZY_SHEET_IDS = [8723, 15405, 9401]
+// Current-build module IDs (343.2)
+const LAZY_SHEET_IDS = [8828, 15561, 9512]
 
 let lazySheetsLoaded = false
 
@@ -230,71 +224,20 @@ export function forceLoadLazySheets(): void {
 	if (lazySheetsLoaded) return
 
 	const { lookupModule } = revenge.modules.finders
-	const { withDependencies, withName, withProps } =
-		revenge.modules.finders.filters
-	const { relative } = withDependencies
+	const { withProps, withName } = revenge.modules.finders.filters
 
-	// Dependency-anchored force-init that survives module ID drift between
-	// builds. `withDependencies` can match uninitialized modules (Dynamic
-	// flag, Uninitialized scope) while the anchored props/name check rejects
-	// wrong candidates, so only the intended module gets initialized.
-	// `relative(+n)` matches a dependency that sits `n` modules after the
-	// module itself, which holds for the sibling modules Discord bundles
-	// alongside each action sheet.
 	const forceInit = (filter: any) => {
 		try {
 			lookupModule(filter, { initialize: true })
 		} catch {}
 	}
 
-	// modules/user_profile/native/showUserProfileActionSheet.tsx (module 8723)
-	forceInit(
-		withDependencies([
-			null,
-			null,
-			null,
-			DEP_USER_STORE,
-			DEP_ASYNC_REQUIRE_IMPL,
-			null,
-			null,
-			null,
-			null,
-			2,
-		]).and(withProps('showUserProfileActionSheetPostConnection')),
-	)
+	// Try to force-initialize by export name (matches initialized modules)
+	forceInit(withProps('showUserProfileActionSheetPostConnection'))
+	forceInit(withProps('showYouAccountActionSheet'))
+	forceInit(withName('UserProfileCustomStatusActionSheet'))
 
-	// modules/main_tabs_v2/native/tabs/you/utils/showYouAccountActionSheet.tsx (module 15405)
-	forceInit(
-		withDependencies([
-			relative(1),
-			null,
-			relative(2),
-			DEP_ASYNC_REQUIRE_IMPL,
-			2,
-		]).and(withProps('showYouAccountActionSheet')),
-	)
-
-	// modules/user_profile/native/UserProfileCustomStatusActionSheet.tsx (module 9401)
-	forceInit(
-		withDependencies([
-			null,
-			null,
-			DEP_USER_STORE,
-			null,
-			null,
-			null,
-			null,
-			null,
-			relative(1),
-			null,
-			null,
-			relative(2),
-			null,
-			null,
-			2,
-		]).and(withName('UserProfileCustomStatusActionSheet')),
-	)
-
+	// Fallback: native require with current build IDs
 	const requireFn = (globalThis as any)?.__r
 	if (typeof requireFn === 'function') {
 		for (const id of LAZY_SHEET_IDS) {
