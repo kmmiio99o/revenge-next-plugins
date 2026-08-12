@@ -215,7 +215,7 @@ export function getHapticFeedbackTypes(): any {
 	return hapticsTypes()
 }
 
-// Current-build module IDs (343.2)
+// Current-build module IDs (343202)
 const LAZY_SHEET_IDS = [8828, 15561, 9512]
 
 let lazySheetsLoaded = false

@@ -1,5 +1,10 @@
 import { Dispatcher } from '@revenge-mod/discord/common/flux'
-import { configureBubbles, hookBubbles, unhookBubbles } from './bubbles'
+import {
+	configureBubbles,
+	hookBubbles,
+	isNativeAvailable,
+	unhookBubbles,
+} from './bubbles'
 import { getSettings, getStorage } from './state'
 import type { PluginCleanupApi } from '@revenge-mod/plugins/types'
 
@@ -42,6 +47,13 @@ export function startBubbles(cleanup: PluginCleanupApi) {
 	let stop = () => {}
 
 	void (async () => {
+		// Defer native hook until after initial render to avoid blocking splash
+		await new Promise(r => setTimeout(r, 0))
+
+		if (!isNativeAvailable()) {
+			return
+		}
+
 		// Hook the MessageView styling and subscribe to appearance/theme changes.
 		// The `bubbles.*` bridge methods are provided by the plugin's native side.
 		await hookBubbles()

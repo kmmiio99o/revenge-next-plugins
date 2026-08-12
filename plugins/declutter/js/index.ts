@@ -23,7 +23,8 @@ export default plugin<{ jsonStorage: DeclutterSettings }>({
 		const sync = () => {
 			void pushNativeConfig()
 		}
-		sync()
+		// Defer native call until after initial render to avoid blocking splash
+		setTimeout(sync, 0)
 		cleanup(jsonStorage.subscribe(sync))
 
 		// Avatar decorations are parsed once and cached on records, so an enabled state only

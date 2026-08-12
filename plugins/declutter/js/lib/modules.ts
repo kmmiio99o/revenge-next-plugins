@@ -14,34 +14,31 @@ function lazy<T>(resolve: () => T): () => T {
 
 const byDefaultName = lazy(() =>
 	revenge.modules.finders.filters.createFilterGenerator<[name: string]>(
-		([name], _id, exports: any) =>
+		([name], _id, exports: any, _initialized: boolean) =>
 			typeof exports?.default === 'function' && exports.default.name === name,
 		([name]) => `revenge.declutter.defaultName(${name})`,
-		revenge.modules.finders.filters.FilterFlag.RequiresExports,
 		revenge.modules.finders.filters.FilterScopes.Initialized,
 	),
 )
 
 const byProps = lazy(() =>
 	revenge.modules.finders.filters.createFilterGenerator<[props: string[]]>(
-		([props], _id, exports: any) =>
+		([props], _id, exports: any, _initialized: boolean) =>
 			exports != null &&
 			(typeof exports === 'object' || typeof exports === 'function') &&
 			props.every(prop => prop in exports),
 		([props]) => `revenge.declutter.props(${props.join(',')})`,
-		revenge.modules.finders.filters.FilterFlag.RequiresExports,
 		revenge.modules.finders.filters.FilterScopes.Initialized,
 	),
 )
 
 const byProfileFrameComponent = lazy(() =>
 	revenge.modules.finders.filters.createFilterGenerator<[]>(
-		(_args, _id, exports: any) =>
+		(_args, _id, exports: any, _initialized: boolean) =>
 			typeof exports?.default === 'function' &&
 			exports.default.name === 'ProfileFrame' &&
 			!('fromServer' in exports.default),
 		() => `revenge.declutter.profileFrameComponent`,
-		revenge.modules.finders.filters.FilterFlag.RequiresExports,
 		revenge.modules.finders.filters.FilterScopes.Initialized,
 	),
 )
@@ -121,13 +118,17 @@ export function onModule(
 	filter: Filter,
 	cb: (namespace: any, id: number) => void,
 ): () => void {
-	return revenge.modules.finders.getModules(
-		filter,
-		(namespace, id) => {
-			cb(namespace, id as number)
-		},
-		{ returnNamespace: true, max: 1 },
-	)
+	try {
+		return revenge.modules.finders.getModules(
+			filter,
+			(namespace, id) => {
+				cb(namespace, id as number)
+			},
+			{ returnNamespace: true, max: 1 },
+		)
+	} catch {
+		return () => {}
+	}
 }
 
 export function onImportedPath<T = any>(

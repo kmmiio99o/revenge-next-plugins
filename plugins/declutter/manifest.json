@@ -5,7 +5,7 @@
 	"description": "Hide profile clutter: avatar decorations, nameplates, profile effects, profile frames, server tags, and badges. Aswell as Nitro/Payment settings.",
 	"author": "kmmiio99o",
 	"icon": "SlashIcon",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"dependencies": {
 		"revenge.api": { "version": ">=1" },
 		"discord": { "version": "*" }

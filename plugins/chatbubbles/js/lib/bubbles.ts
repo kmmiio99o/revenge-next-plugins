@@ -1,8 +1,18 @@
+export function isNativeAvailable(): boolean {
+	try {
+		return typeof revenge?.modules?.native?.callNativeMethod === 'function'
+	} catch {
+		return false
+	}
+}
+
 export function hookBubbles() {
+	if (!isNativeAvailable()) return Promise.resolve()
 	return revenge.modules.native.callNativeMethod('bubbles.hook', [])
 }
 
 export function unhookBubbles() {
+	if (!isNativeAvailable()) return Promise.resolve()
 	return revenge.modules.native.callNativeMethod('bubbles.unhook', [])
 }
 
@@ -23,6 +33,7 @@ export function configureBubbles(
 	bubbleRadius?: number,
 	bubbleColor?: number | null,
 ) {
+	if (!isNativeAvailable()) return Promise.resolve()
 	return revenge.modules.native.callNativeMethod('bubbles.configure', [
 		avatarRadius,
 		bubbleRadius,
