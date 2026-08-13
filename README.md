@@ -11,6 +11,7 @@ A collection of plugins for the [**Revenge Next**](https://github.com/revenge-mo
 | **Chat Bubbles** | Styles messages into chat bubbles with rounded corners and a customizable accent color, plus a rounded-square profile picture. |
 | **Declutter** | Hides profile clutter: avatar decorations, nameplates, profile effects, profile frames, server tags, and badges. |
 | **Multi Scrobbler** | Show your currently playing track from Last.fm, Libre.fm, or ListenBrainz as a rich presence activity on your Discord profile. |
+| **Server Info** | Displays detailed server information in an action sheet — name, description, icon, creation date, server ID, owner, and banner. |
 
 ---
 
