@@ -2,6 +2,7 @@ import { OverviewRows } from './OverviewRows'
 import { ServerBanner } from './ServerBanner'
 import { ServerHeader } from './ServerHeader'
 import { ServerRows } from './ServerRows'
+import { FriendsRows } from './FriendsRows'
 import { useGuildInfo } from './useGuildInfo'
 
 export interface ServerInfoSheetProps {
@@ -92,19 +93,27 @@ export default function ServerInfoSheet({ guildId }: ServerInfoSheetProps) {
 						}
 					}}
 						scrollEventThrottle={16}
+				>
+					{/* Content wrapper -- banner is absolute, content is padded down via ScrollContainer */}
+					<View
+						style={{
+							marginHorizontal: -sideInset,
+							paddingHorizontal: sideInset,
+							gap: 16,
+							paddingTop: 8,
+						}}
 					>
-						{/* Content wrapper -- banner is absolute, content is padded down via ScrollContainer */}
-						<View style={{ marginHorizontal: -sideInset, paddingHorizontal: sideInset, gap: 16 }}>
-							<ServerHeader
-								name={guild.name}
-								description={guild.description}
-								iconUri={info.iconUri}
-							/>
-							<OverviewRows {...info} />
-							<ServerRows guildId={guildId} {...info} />
-						</View>
-					</ScrollContainer>
-				</View>
+						<ServerHeader
+							name={guild.name}
+							description={guild.description}
+							iconUri={info.iconUri}
+						/>
+						<OverviewRows {...info} />
+						<ServerRows guildId={guildId} {...info} />
+						<FriendsRows guildId={guildId} friends={info.friends} />
+					</View>
+				</ScrollContainer>
+			</View>
 		</ActionSheet>
 	)
 }

@@ -18,7 +18,8 @@ export function ServerHeader({
 				flexDirection: 'row',
 				alignItems: 'center',
 				gap: 12,
-				paddingTop: 8,
+				paddingTop: 16,
+				paddingBottom: 8,
 			}}
 		>
 			{iconUri != null && (

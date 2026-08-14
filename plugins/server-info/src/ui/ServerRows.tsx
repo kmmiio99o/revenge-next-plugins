@@ -55,6 +55,7 @@ export function ServerRows({
 									getShowUserProfileActionSheet()?.({
 										userId: ownerId,
 										guildId,
+										ignoreBlockedSpeedBump: false,
 									})
 								}, 0)
 							}

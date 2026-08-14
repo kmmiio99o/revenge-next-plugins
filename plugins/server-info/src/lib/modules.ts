@@ -93,11 +93,19 @@ const guildChannelStore = createStoreGetter('GuildChannelStore')
 const guildMemberCountStore = createStoreGetter('GuildMemberCountStore')
 const guildHeaderCountsStore = createStoreGetter('GuildHeaderCountsStore')
 const basicGuildStore = createStoreGetter('BasicGuildStore')
+const guildMemberStore = createStoreGetter('GuildMemberStore')
+const relationshipStore = createStoreGetter('RelationshipStore')
 
 // modules/guild/BasicGuildActionCreators.tsx — fetchBasicGuild
 const fetchBasicGuildFn = createModuleGetter<any>(
 	revenge.modules.finders.filters.withProps('fetchBasicGuild'),
 	exports => exports?.fetchBasicGuild,
+)
+
+// modules/guild/GuildActionCreators.tsx — requestMembersById
+const requestMembersByIdFn = createModuleGetter<any>(
+	revenge.modules.finders.filters.withProps('requestMembersById'),
+	exports => exports?.requestMembersById,
 )
 
 // Discord's internal HTTP client for REST API calls
@@ -108,15 +116,8 @@ const httpUtilsFn = createModuleGetter<any>(
 
 // modules/user_profile/native/showUserProfileActionSheet.tsx
 const showUserProfileActionSheetFn = createModuleGetter<any>(
-	withProps('showUserProfileActionSheetPostConnection'),
-	exports => {
-		if (typeof exports === 'function') return exports
-		if (typeof exports?.default === 'function') return exports.default
-		if (typeof exports?.showUserProfileActionSheet === 'function') {
-			return exports.showUserProfileActionSheet
-		}
-		return undefined
-	},
+	revenge.modules.finders.filters.withProps('showUserProfileActionSheetPostConnection'),
+	exports => exports?.default,
 )
 
 export function waitForGuildsBarGuildMenu(
@@ -194,6 +195,14 @@ export function getBasicGuildStore(): any {
 	return basicGuildStore()
 }
 
+export function getGuildMemberStore(): any {
+	return guildMemberStore()
+}
+
+export function getRelationshipStore(): any {
+	return relationshipStore()
+}
+
 export function getHTTPUtils(): any {
 	return httpUtilsFn()
 }
@@ -202,12 +211,16 @@ export function getFetchBasicGuild(): any {
 	return fetchBasicGuildFn()
 }
 
+export function getRequestMembersById(): any {
+	return requestMembersByIdFn()
+}
+
 export function getShowUserProfileActionSheet(): any {
 	return showUserProfileActionSheetFn()
 }
 
-// Current-build module ID for showUserProfileActionSheet
-const LAZY_SHEET_IDS = [8828]
+// Current-build module IDs
+const LAZY_SHEET_IDS = [8832]
 
 let lazySheetsLoaded = false
 
@@ -223,10 +236,11 @@ export function forceLoadLazySheets(): void {
 		} catch {}
 	}
 
-	// Try to force-initialize by export name (matches initialized modules)
+	// Force-initialize lazy modules we depend on
 	forceInit(withProps('showUserProfileActionSheetPostConnection'))
+	forceInit(withProps('requestMembersById'))
 
-	// Fallback: native require with current build ID
+	// Fallback: native require with current build IDs
 	const requireFn = (globalThis as any)?.__r
 	if (typeof requireFn === 'function') {
 		for (const id of LAZY_SHEET_IDS) {

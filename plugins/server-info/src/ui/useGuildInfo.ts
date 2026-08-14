@@ -4,10 +4,14 @@ import {
 	getGuildChannelStore,
 	getGuildHeaderCountsStore,
 	getGuildMemberCountStore,
+	getGuildMemberStore,
 	getGuildRoleStore,
 	getGuildStore,
 	getHTTPUtils,
+	getRelationshipStore,
+	getRequestMembersById,
 	getUserStore,
+	forceLoadLazySheets,
 } from '../lib/modules'
 
 export interface GuildInfo {
@@ -25,6 +29,12 @@ export interface GuildInfo {
 	boostLabel: string | undefined
 	premiumTier: number
 	createdLabel: string | undefined
+	friends: Array<{
+		userId: string
+		displayName: string
+		avatarHash: string | undefined
+		nick: string | undefined
+	}>
 }
 
 export function useGuildInfo(guildId: string): GuildInfo {
@@ -47,6 +57,7 @@ export function useGuildInfo(guildId: string): GuildInfo {
 			getGuildMemberCountStore(),
 			getGuildHeaderCountsStore(),
 			getBasicGuildStore(),
+			getGuildMemberStore(),
 		].filter(Boolean)
 		for (const store of stores) store.addChangeListener(forceUpdate)
 
@@ -65,6 +76,20 @@ export function useGuildInfo(guildId: string): GuildInfo {
 			for (const store of stores) store.removeChangeListener(forceUpdate)
 		}
 	}, [forceUpdate])
+
+	// Request friends specifically with presences=false to include offline friends
+	React.useEffect(() => {
+		const requestMembersById = getRequestMembersById()
+		const friendIds = getRelationshipStore()?.getFriendIDs?.() ?? []
+		if (requestMembersById && friendIds.length > 0) {
+			requestMembersById(guildId, friendIds, false)
+		}
+	}, [guildId])
+
+	// Ensure lazy modules are initialized
+	React.useEffect(() => {
+		forceLoadLazySheets()
+	}, [])
 
 	// Fetch full guild via REST API when ownerId is not available
 	React.useEffect(() => {
@@ -160,22 +185,19 @@ export function useGuildInfo(guildId: string): GuildInfo {
 	const banner: string | null = guild?.banner ?? null
 	const ownerId: string | null = guild?.ownerId ?? profileOwnerId
 
-	const iconExt = icon?.startsWith('a_') ? 'gif' : 'webp'
-	const bannerExt = banner?.startsWith('a_') ? 'gif' : 'webp'
 	const iconUri = icon
-		? `https://cdn.discordapp.com/icons/${guild?.id}/${icon}.${iconExt}?size=128`
+		? `https://cdn.discordapp.com/icons/${guild?.id}/${icon}?size=128`
 		: undefined
 	const bannerUri = banner
-		? `https://cdn.discordapp.com/banners/${guild?.id}/${banner}.${bannerExt}?size=1024`
+		? `https://cdn.discordapp.com/banners/${guild?.id}/${banner}?size=1024`
 		: undefined
 
 	const owner = ownerId ? getUserStore()?.getUser(ownerId) : null
 	const ownerDisplayName = owner?.globalName ?? owner?.username ?? ownerName
 
 	const ownerAvatarHash = ownerAvatar ?? owner?.avatar
-	const ownerAvatarExt = ownerAvatarHash?.startsWith('a_') ? 'gif' : 'png'
 	const ownerAvatarUri = ownerAvatarHash
-		? `https://cdn.discordapp.com/avatars/${ownerId}/${ownerAvatarHash}.${ownerAvatarExt}?size=64`
+		? `https://cdn.discordapp.com/avatars/${ownerId}/${ownerAvatarHash}?size=64`
 		: undefined
 
 	const memberCountStore = getGuildMemberCountStore()
@@ -187,6 +209,25 @@ export function useGuildInfo(guildId: string): GuildInfo {
 	const channelCount = Object.keys(
 		getGuildChannelStore()?.getChannels?.(guildId) ?? {},
 	).length
+
+	// Get friend IDs from RelationshipStore
+	const friendIds: string[] = getRelationshipStore()?.getFriendIDs?.() ?? []
+
+	// Use getMember for each friend - works if member is in store (fetched via requestMembersById)
+	const guildMemberStore = getGuildMemberStore()
+	const userStore = getUserStore()
+	const friendsInGuild = friendIds
+		.filter((id) => guildMemberStore?.getMember?.(guildId, id) != null)
+		.map((id) => {
+			const member = guildMemberStore?.getMember?.(guildId, id)
+			const user = userStore?.getUser?.(id)
+			return {
+				userId: id,
+				displayName: user?.globalName ?? user?.username ?? 'Unknown',
+				avatarHash: user?.avatar,
+				nick: member?.nick,
+			}
+		})
 
 	const premiumTier: number = guild?.premiumTier ?? 0
 	const boostCount: number | null | undefined = guild?.premiumSubscriptionCount
@@ -219,5 +260,6 @@ export function useGuildInfo(guildId: string): GuildInfo {
 		boostLabel,
 		premiumTier,
 		createdLabel,
+		friends: friendsInGuild,
 	}
 }
