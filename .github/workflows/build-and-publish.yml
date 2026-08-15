@@ -89,7 +89,7 @@ jobs:
           publish_dir: ./dist
           destination_dir: .
           keep_files: false
-          force_orphan: true
+          force_orphan: false
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
           commit_message: 'chore: publish plugin zips [skip ci]'
