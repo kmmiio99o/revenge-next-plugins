@@ -19,9 +19,3 @@ export function getStorage() {
 export function getSettings(): ChatboxAvatarStorage {
 	return { ...DEFAULTS, ...(storage?.cache ?? {}) }
 }
-
-export function setSettings(patch: Partial<ChatboxAvatarStorage>): void {
-	storage?.set({ ...getSettings(), ...patch })
-}
-
-export { DEFAULTS }

@@ -117,7 +117,7 @@ const avatar = createModuleGetter<any>(
 	exports => resolveComponent(exports),
 )
 
-// modules/user_profile/native/showUserProfileActionSheet.tsx (module 8723)
+// modules/user_profile/native/showUserProfileActionSheet.tsx (module 8929)
 // Exports: { default: showUserProfileActionSheet, getUserProfileActionSheetKey, ... }
 const profileSheetFn = createModuleGetter<any>(
 	revenge.modules.finders.filters.withProps(
@@ -133,7 +133,7 @@ const profileSheetFn = createModuleGetter<any>(
 	},
 )
 
-// modules/main_tabs_v2/native/tabs/you/utils/showYouAccountActionSheet.tsx (module 15405)
+// modules/main_tabs_v2/native/tabs/you/utils/showYouAccountActionSheet.tsx (module 15629)
 // Exports: { showYouAccountActionSheet }
 const accountSheetFn = createModuleGetter<any>(
 	revenge.modules.finders.filters.withProps('showYouAccountActionSheet'),
@@ -141,19 +141,6 @@ const accountSheetFn = createModuleGetter<any>(
 		typeof exports?.showYouAccountActionSheet === 'function'
 			? exports.showYouAccountActionSheet
 			: undefined,
-)
-
-// modules/user_profile/native/UserProfileCustomStatusActionSheet.tsx (module 9401)
-// Exports: { default: UserProfileCustomStatusActionSheet }
-const customStatusSheetFn = createModuleGetter<any>(
-	revenge.modules.finders.filters.withName(
-		'UserProfileCustomStatusActionSheet',
-	),
-	exports => {
-		if (typeof exports === 'function') return exports
-		if (typeof exports?.default === 'function') return exports.default
-		return undefined
-	},
 )
 
 // modules/haptics/HapticUtils.native.tsx (module 4271)
@@ -183,9 +170,6 @@ export function getDisplayNameFilter(name: string) {
 export function getAvatar(): any {
 	return avatar()
 }
-export function getAvatarSizes(): any {
-	return avatar()?.AvatarSizes
-}
 export function getUserStore(): any {
 	return userStore()
 }
@@ -202,12 +186,6 @@ export function getChannelStore(): any {
 export function getShowUserProfileActionSheet(): any {
 	return profileSheetFn()
 }
-export function getShowYouAccountActionSheet(): any {
-	return accountSheetFn()
-}
-export function getShowCustomStatusActionSheet(): any {
-	return customStatusSheetFn()
-}
 export function getTriggerHapticFeedback(): any {
 	return hapticsFn()
 }
@@ -215,8 +193,11 @@ export function getHapticFeedbackTypes(): any {
 	return hapticsTypes()
 }
 
-// Current-build module IDs (343202)
-const LAZY_SHEET_IDS = [8832, 15570, 9516]
+// Current-build module IDs (343206):
+//   8929 modules/user_profile/native/showUserProfileActionSheet.tsx
+//   15629 modules/main_tabs_v2/native/tabs/you/utils/showYouAccountActionSheet.tsx
+//   15631 modules/main_tabs_v2/native/tabs/you/YouAccountActionSheet.tsx
+const LAZY_SHEET_IDS = [8929, 15629, 15631]
 
 let lazySheetsLoaded = false
 
@@ -224,49 +205,79 @@ export function forceLoadLazySheets(): void {
 	if (lazySheetsLoaded) return
 
 	const { lookupModule } = revenge.modules.finders
-	const { withProps, withName } = revenge.modules.finders.filters
+	const { withProps } = revenge.modules.finders.filters
 
 	const forceInit = (filter: any) => {
 		try {
 			lookupModule(filter, { initialize: true })
-		} catch {}
+		} catch (e) {
+			console.log('[chatbox-avatar] forceInit error:', e)
+		}
 	}
 
-	// Try to force-initialize by export name (matches initialized modules)
 	forceInit(withProps('showUserProfileActionSheetPostConnection'))
 	forceInit(withProps('showYouAccountActionSheet'))
-	forceInit(withName('UserProfileCustomStatusActionSheet'))
 
-	// Fallback: native require with current build IDs
 	const requireFn = (globalThis as any)?.__r
 	if (typeof requireFn === 'function') {
 		for (const id of LAZY_SHEET_IDS) {
 			try {
 				requireFn(id)
-			} catch {}
+			} catch (e) {
+				console.log('[chatbox-avatar] __r error:', id, e)
+			}
 		}
 	}
 
 	lazySheetsLoaded = true
 }
 
-export function openAccountSheet(_userId: string, _channelId?: string) {
-	try {
-		forceLoadLazySheets()
-		const fn = accountSheetFn()
-		if (typeof fn === 'function') {
-			fn(false, true)
+// Discord loads the You-tab modules (15629/15631) lazily through
+// asyncRequire (module 2007), never a plain synchronous require. Mirror that.
+function requireLazy(id: number): Promise<any> {
+	const r = (globalThis as any)?.__r
+	if (typeof r !== 'function') return Promise.resolve(undefined)
+
+	// asyncRequire(moduleId, paths?) -> Promise<namespace>. Without paths it
+	// falls back to importAll(moduleId) = metroRequire(moduleId).
+	const mod = (() => {
+		try {
+			return r(2007)
+		} catch {
+			return undefined
 		}
-	} catch {}
+	})()
+	const fn = mod?.default ?? mod
+	if (typeof fn === 'function') {
+		try {
+			const p = fn(id)
+			if (p && typeof p.then === 'function') return p
+		} catch {}
+	}
+
+	try {
+		return Promise.resolve(r(id))
+	} catch {
+		return Promise.resolve(undefined)
+	}
 }
 
-export function openCustomStatusSheet(
-	userId: string,
-	guildId?: string,
-	channelId?: string,
-) {
+export function openAccountSheet(_userId: string, _channelId?: string) {
 	try {
-		forceLoadLazySheets()
-		customStatusSheetFn()?.({ user: { id: userId, guildId, channelId } })
-	} catch {}
+		// Primary: replicate YouBar — require module 15629 via asyncRequire and
+		// call its showYouAccountActionSheet() with no args.
+		requireLazy(15629)
+			.then(ns => {
+				if (ns && typeof ns.showYouAccountActionSheet === 'function') {
+					ns.showYouAccountActionSheet()
+					return
+				}
+				forceLoadLazySheets()
+				const fn = accountSheetFn()
+				if (typeof fn === 'function') fn()
+			})
+			.catch(e => console.log('[chatbox-avatar] openAccountSheet error:', e))
+	} catch (e) {
+		console.log('[chatbox-avatar] openAccountSheet error:', e)
+	}
 }
