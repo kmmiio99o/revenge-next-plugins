@@ -1,0 +1,37 @@
+name: Update Discord Module IDs
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Update module IDs from decord
+        run: bun scripts/update-discord-module-ids.mjs
+
+      - name: Commit changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            BUILD=$(bun -e "import('./plugins/shared/discord-modules.ts').then(m => console.log(m.discordBuild))")
+            git config user.name 'github-actions[bot]'
+            git config user.email 'github-actions[bot]@users.noreply.github.com'
+            git add .
+            git commit -m "chore(chatbox-avatar): update Discord module IDs (build ${BUILD})"
+            git push
+          else
+            echo 'No module ID changes'
+          fi

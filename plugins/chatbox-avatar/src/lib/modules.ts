@@ -1,3 +1,24 @@
+import { discordModules } from '@shared'
+
+const MODULE_PATHS = {
+	showUserProfileActionSheet:
+		'modules/user_profile/native/showUserProfileActionSheet.tsx',
+	showYouAccountActionSheet:
+		'modules/main_tabs_v2/native/tabs/you/utils/showYouAccountActionSheet.tsx',
+	YouAccountActionSheet:
+		'modules/main_tabs_v2/native/tabs/you/YouAccountActionSheet.tsx',
+} as const
+
+function moduleId(name: keyof typeof MODULE_PATHS): number {
+	const id = discordModules[MODULE_PATHS[name]]
+	if (typeof id !== 'number') {
+		throw new Error(
+			`chatbox-avatar: missing module id for "${MODULE_PATHS[name]}" in discord-modules.ts`,
+		)
+	}
+	return id
+}
+
 function createModuleGetter<T>(
 	filter: any,
 	resolve: (exports: any) => T | undefined,
@@ -193,11 +214,11 @@ export function getHapticFeedbackTypes(): any {
 	return hapticsTypes()
 }
 
-// Current-build module IDs (343206):
-//   8929 modules/user_profile/native/showUserProfileActionSheet.tsx
-//   15629 modules/main_tabs_v2/native/tabs/you/utils/showYouAccountActionSheet.tsx
-//   15631 modules/main_tabs_v2/native/tabs/you/YouAccountActionSheet.tsx
-const LAZY_SHEET_IDS = [8929, 15629, 15631]
+const LAZY_SHEET_IDS = [
+	moduleId('showUserProfileActionSheet'),
+	moduleId('showYouAccountActionSheet'),
+	moduleId('YouAccountActionSheet'),
+]
 
 let lazySheetsLoaded = false
 
@@ -232,8 +253,8 @@ export function forceLoadLazySheets(): void {
 	lazySheetsLoaded = true
 }
 
-// Discord loads the You-tab modules (15629/15631) lazily through
-// asyncRequire (module 2007), never a plain synchronous require. Mirror that.
+// Discord loads the You-tab modules lazily through asyncRequire (module 2007),
+// never a plain synchronous require. Mirror that.
 function requireLazy(id: number): Promise<any> {
 	const r = (globalThis as any)?.__r
 	if (typeof r !== 'function') return Promise.resolve(undefined)
@@ -264,9 +285,9 @@ function requireLazy(id: number): Promise<any> {
 
 export function openAccountSheet(_userId: string, _channelId?: string) {
 	try {
-		// Primary: replicate YouBar — require module 15629 via asyncRequire and
-		// call its showYouAccountActionSheet() with no args.
-		requireLazy(15629)
+		// replicate YouBar — require the showYouAccountActionSheet module
+		// via asyncRequire and call its showYouAccountActionSheet() with no args.
+		requireLazy(moduleId('showYouAccountActionSheet'))
 			.then(ns => {
 				if (ns && typeof ns.showYouAccountActionSheet === 'function') {
 					ns.showYouAccountActionSheet()

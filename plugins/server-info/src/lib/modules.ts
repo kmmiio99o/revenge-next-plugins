@@ -4,6 +4,8 @@
 // later once a lazy module initializes, and the sync `lookupModule` fallback
 // covers the already-initialized case.
 
+import { discordModules } from '@shared'
+
 function createModuleGetter<T>(
 	filter: any,
 	resolve: (exports: any) => T | undefined,
@@ -116,7 +118,9 @@ const httpUtilsFn = createModuleGetter<any>(
 
 // modules/user_profile/native/showUserProfileActionSheet.tsx
 const showUserProfileActionSheetFn = createModuleGetter<any>(
-	revenge.modules.finders.filters.withProps('showUserProfileActionSheetPostConnection'),
+	revenge.modules.finders.filters.withProps(
+		'showUserProfileActionSheetPostConnection',
+	),
 	exports => exports?.default,
 )
 
@@ -219,8 +223,9 @@ export function getShowUserProfileActionSheet(): any {
 	return showUserProfileActionSheetFn()
 }
 
-// Current-build module IDs
-const LAZY_SHEET_IDS = [8832]
+const LAZY_SHEET_IDS = [
+	discordModules['modules/user_profile/native/showUserProfileActionSheet.tsx'],
+]
 
 let lazySheetsLoaded = false
 
