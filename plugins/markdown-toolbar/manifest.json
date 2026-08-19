@@ -1,0 +1,16 @@
+{
+	"format": 1,
+	"id": "dev.kmmiio99o.markdown.toolbar",
+	"name": "Markdown Toolbar",
+	"description": "Floating markdown formatting bar under chat input.",
+	"author": "kmmiio99o",
+	"icon": "LettersIcon",
+	"version": "1.0.0",
+	"dependencies": {
+		"revenge.api": { "version": ">=1" },
+		"discord": { "version": "*" }
+	},
+	"dist": {
+		"script": "index.js"
+	}
+}
