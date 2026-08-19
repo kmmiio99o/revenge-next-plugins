@@ -1,12 +1,13 @@
 import { patchChatInput } from './lib/patch'
 
 export default plugin({
-	start({ cleanup }) {
+	start({ cleanup, plugin }) {
 		try {
-			const dispose = patchChatInput()
-			cleanup(() => {
-				dispose()
-			})
-		} catch (e) {}
+			cleanup(patchChatInput())
+		} catch {}
+
+		if (plugin.startedLate) {
+			plugin.requireReload()
+		}
 	},
 })
