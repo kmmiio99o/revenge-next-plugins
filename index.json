@@ -99,6 +99,30 @@
         }
       }
     },
+    "dev.kmmiio99o.markdown.toolbar": {
+      "name": "Markdown Toolbar",
+      "description": "Floating markdown formatting bar under chat input.",
+      "author": "kmmiio99o",
+      "icon": "LettersIcon",
+      "channels": {
+        "latest": "1.0.0"
+      },
+      "versions": {
+        "1.0.0": {
+          "url": "https://rn.kmmiio99o.dev/dev.kmmiio99o.markdown.toolbar.zip",
+          "sha256": "47bcab6e2ef385fd5af5726b851f0908a36eb875c9409f6d3e763e5a9d753b1b",
+          "size": 2195,
+          "dependencies": {
+            "revenge.api": {
+              "version": ">=1"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        }
+      }
+    },
     "dev.kmmiio99o.multi-scrobbler": {
       "name": "Multi Scrobbler",
       "description": "Show off your music status from Last.fm, Libre.fm, or ListenBrainz on your Discord profile with comprehensive console logging.",
