@@ -1,4 +1,5 @@
 import { DEFAULTS } from './defaults'
+import { initKmmiioLib } from './lib/modules'
 import { pushNativeConfig } from './lib/bridge'
 import { patchAll } from './lib/patches'
 import { getSettings, setStorage } from './lib/state'
@@ -14,6 +15,19 @@ export default plugin<{ jsonStorage: DeclutterSettings }>({
 		default: DEFAULTS,
 	},
 	start({ cleanup, jsonStorage, plugin }) {
+		const kmmiio = (globalThis as any).__kmmiio
+		kmmiio?.setActivePlugin?.(plugin.manifest.id)
+		initKmmiioLib(kmmiio)
+		kmmiio?.registerPlugin({
+			id: plugin.manifest.id,
+			name: plugin.manifest.name,
+			icon: plugin.manifest.icon,
+			author: plugin.manifest.author,
+			description: plugin.manifest.description,
+			version: plugin.manifest.version,
+			getStatus: () => plugin.status,
+			getErrors: () => plugin.errors,
+		})
 		setStorage(jsonStorage)
 
 		try {

@@ -1,259 +1,111 @@
-// Discord module/store lookups, all deferred behind lazy getters. Resolving at
-// module top level can silently cache a "not found" result if it runs before a
-// module initializes; `getModules` fires immediately for initialized modules and
-// later once a lazy module initializes, and the sync `lookupModule` fallback
-// covers the already-initialized case.
+let kmmiio: any
+const PLUGIN_ID = 'dev.kmmiio99o.server-info'
 
-import { discordModules } from '@shared'
-
-function createModuleGetter<T>(
-	filter: any,
-	resolve: (exports: any) => T | undefined,
-): () => T | undefined {
-	const { getModules, lookupModule } = revenge.modules.finders
-
-	let cached: T | undefined
-	let done = false
-	let unsub: (() => void) | undefined
-
-	try {
-		unsub = getModules(filter, (exports: any) => {
-			try {
-				const resolved = resolve(exports)
-				if (resolved !== undefined) {
-					cached = resolved
-					done = true
-					unsub?.()
-				}
-			} catch {}
-		})
-	} catch {}
-
-	return () => {
-		if (done) return cached
-		try {
-			const resolved = resolve(lookupModule(filter)?.[0])
-			if (resolved !== undefined) {
-				cached = resolved
-				done = true
-			}
-		} catch {}
-		return cached
-	}
+export function initKmmiioLib(api: any) {
+	kmmiio = api
 }
 
-function createStoreGetter(name: string): () => any {
-	const { getStore, Stores } = revenge.discord.flux
-
-	let cached: any
-	let done = false
-	let unsub: (() => void) | undefined
-
-	try {
-		unsub = getStore(name, (store: any) => {
-			cached = store
-			done = true
-			unsub?.()
-		})
-	} catch {}
-
-	return () => {
-		if (done) return cached
-		try {
-			const viaProxy = (Stores as any)[name]
-			if (viaProxy) {
-				cached = viaProxy
-				done = true
-			}
-		} catch {}
-		return cached
-	}
-}
-
-const { withProps } = revenge.modules.finders.filters
-
-const withGeneratedIconComponent = ((): any => {
-	try {
-		return (revenge as any).utils.discord.withGeneratedIconComponent
-	} catch {
-		return undefined
-	}
-})()
-
-// design/components/Icon/native/redesign/generated/... — lazy generated icon
-const infoIcon = createModuleGetter<any>(
-	withGeneratedIconComponent
-		? withGeneratedIconComponent('CircleInformationIcon')
-		: withProps('CircleInformationIcon'),
-	exports => exports?.CircleInformationIcon,
-)
-
-const guildStore = createStoreGetter('GuildStore')
-const userStore = createStoreGetter('UserStore')
-const guildRoleStore = createStoreGetter('GuildRoleStore')
-const guildChannelStore = createStoreGetter('GuildChannelStore')
-const guildMemberCountStore = createStoreGetter('GuildMemberCountStore')
-const guildHeaderCountsStore = createStoreGetter('GuildHeaderCountsStore')
-const basicGuildStore = createStoreGetter('BasicGuildStore')
-const guildMemberStore = createStoreGetter('GuildMemberStore')
-const relationshipStore = createStoreGetter('RelationshipStore')
-
-// modules/guild/BasicGuildActionCreators.tsx — fetchBasicGuild
-const fetchBasicGuildFn = createModuleGetter<any>(
-	revenge.modules.finders.filters.withProps('fetchBasicGuild'),
-	exports => exports?.fetchBasicGuild,
-)
-
-// modules/guild/GuildActionCreators.tsx — requestMembersById
-const requestMembersByIdFn = createModuleGetter<any>(
-	revenge.modules.finders.filters.withProps('requestMembersById'),
-	exports => exports?.requestMembersById,
-)
-
-// Discord's internal HTTP client for REST API calls
-const httpUtilsFn = createModuleGetter<any>(
-	withProps('getAPIBaseURL', 'get', 'post'),
-	exports => exports,
-)
-
-// modules/user_profile/native/showUserProfileActionSheet.tsx
-const showUserProfileActionSheetFn = createModuleGetter<any>(
-	revenge.modules.finders.filters.withProps(
-		'showUserProfileActionSheetPostConnection',
-	),
-	exports => exports?.default,
-)
-
-export function waitForGuildsBarGuildMenu(
-	callback: (ns: any) => void,
-): () => void {
-	let fired = false
-	const once = (exports: any) => {
-		if (fired) return
-		// `returnNamespace: true` makes the finder hand over the real module
-		// namespace (`{ __esModule, default }`) instead of unwrapping the
-		// matched default export. Patching `default` on that object mutates the
-		// real export; without it the finder returns the bare function and any
-		// patch lands on a synthetic wrapper that Discord never sees.
-		const ns = exports?.default !== undefined ? exports : { default: exports }
-		if (typeof ns.default !== 'function') return
-		fired = true
-		try {
-			callback(ns)
-		} catch {}
-	}
-
-	// Single resolution path: find by export name. `getModules` calls back
-	// immediately when the module is already initialized and later when a
-	// lazy module first initializes, so this covers cold start and hot reload.
-	try {
-		const { getModules, filters } = revenge.modules.finders
-		const filter = filters.withName('getGuildsBarGuildMenuItems')
-		return getModules(filter, (exports: any) => once(exports), {
-			returnNamespace: true,
-		})
-	} catch {}
-
-	return () => {
-		fired = true
-	}
-}
-
-export function getInfoIcon(): any {
-	return infoIcon()
+function log(module: string, action: string, found: boolean) {
+	kmmiio?.logUsage?.(PLUGIN_ID, module, action, found)
 }
 
 export function getActionSheetActionCreators(): any {
-	try {
-		return (revenge as any).discord?.actions?.ActionSheetActionCreators
-	} catch {
-		return undefined
-	}
+	const result = kmmiio?.getActionSheetActionCreators()
+	log('actionSheetCreators', 'resolve', result != null)
+	return result
 }
 
 export function getGuildStore(): any {
-	return guildStore()
+	const result = kmmiio?.getGuildStore()
+	log('store:GuildStore', 'resolve', result != null)
+	return result
 }
 
 export function getUserStore(): any {
-	return userStore()
+	const result = kmmiio?.getUserStore()
+	log('store:UserStore', 'resolve', result != null)
+	return result
 }
 
 export function getGuildRoleStore(): any {
-	return guildRoleStore()
+	const result = kmmiio?.getGuildRoleStore()
+	log('store:GuildRoleStore', 'resolve', result != null)
+	return result
 }
 
 export function getGuildChannelStore(): any {
-	return guildChannelStore()
+	const result = kmmiio?.getGuildChannelStore()
+	log('store:GuildChannelStore', 'resolve', result != null)
+	return result
 }
 
 export function getGuildMemberCountStore(): any {
-	return guildMemberCountStore()
+	const result = kmmiio?.getGuildMemberCountStore()
+	log('store:GuildMemberCountStore', 'resolve', result != null)
+	return result
 }
 
 export function getGuildHeaderCountsStore(): any {
-	return guildHeaderCountsStore()
+	const result = kmmiio?.getGuildHeaderCountsStore()
+	log('store:GuildHeaderCountsStore', 'resolve', result != null)
+	return result
 }
 
 export function getBasicGuildStore(): any {
-	return basicGuildStore()
+	const result = kmmiio?.getBasicGuildStore()
+	log('store:BasicGuildStore', 'resolve', result != null)
+	return result
 }
 
 export function getGuildMemberStore(): any {
-	return guildMemberStore()
+	const result = kmmiio?.getGuildMemberStore()
+	log('store:GuildMemberStore', 'resolve', result != null)
+	return result
 }
 
 export function getRelationshipStore(): any {
-	return relationshipStore()
+	const result = kmmiio?.getRelationshipStore()
+	log('store:RelationshipStore', 'resolve', result != null)
+	return result
 }
 
 export function getHTTPUtils(): any {
-	return httpUtilsFn()
+	const result = kmmiio?.getHTTPUtils()
+	log('httpUtils', 'resolve', result != null)
+	return result
 }
 
 export function getFetchBasicGuild(): any {
-	return fetchBasicGuildFn()
+	const result = kmmiio?.getFetchBasicGuild()
+	log('fetchBasicGuild', 'resolve', result != null)
+	return result
 }
 
 export function getRequestMembersById(): any {
-	return requestMembersByIdFn()
+	const result = kmmiio?.getRequestMembersById()
+	log('requestMembersById', 'resolve', result != null)
+	return result
 }
 
 export function getShowUserProfileActionSheet(): any {
-	return showUserProfileActionSheetFn()
+	const result = kmmiio?.getShowUserProfileActionSheet()
+	log('profileSheet', 'resolve', result != null)
+	return result
 }
 
-const LAZY_SHEET_IDS = [
-	discordModules['modules/user_profile/native/showUserProfileActionSheet.tsx'],
-]
+export function getInfoIcon(): any {
+	const result = kmmiio?.getIcon?.('CircleInformationIcon')
+	log('icon:CircleInformationIcon', 'resolve', result != null)
+	return result
+}
 
-let lazySheetsLoaded = false
+export function waitForGuildsBarGuildMenu(callback: (ns: any) => void): () => void {
+	const result = kmmiio?.waitForGuildsBarGuildMenu(callback)
+	log('guild:barMenu', 'subscribe', result != null && result !== (() => {}))
+	return result ?? (() => {})
+}
 
 export function forceLoadLazySheets(): void {
-	if (lazySheetsLoaded) return
-
-	const { lookupModule } = revenge.modules.finders
-	const { withProps } = revenge.modules.finders.filters
-
-	const forceInit = (filter: any) => {
-		try {
-			lookupModule(filter, { initialize: true })
-		} catch {}
-	}
-
-	// Force-initialize lazy modules we depend on
-	forceInit(withProps('showUserProfileActionSheetPostConnection'))
-	forceInit(withProps('requestMembersById'))
-
-	// Fallback: native require with current build IDs
-	const requireFn = (globalThis as any)?.__r
-	if (typeof requireFn === 'function') {
-		for (const id of LAZY_SHEET_IDS) {
-			try {
-				requireFn(id)
-			} catch {}
-		}
-	}
-
-	lazySheetsLoaded = true
+	kmmiio?.forceLoadLazySheets()
+	log('sheets:lazyLoad', 'forceLoad', true)
 }

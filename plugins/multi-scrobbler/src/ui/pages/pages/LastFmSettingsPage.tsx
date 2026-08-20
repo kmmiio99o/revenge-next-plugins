@@ -25,10 +25,10 @@ export default function LastFmSettingsPage() {
 				isValid
 					? 'Last.fm connection successful!'
 					: 'Last.fm connection failed',
-				isValid ? 'CheckIcon' : 'XIcon',
+				isValid ? 'CircleCheckIcon' : 'CircleXIcon',
 			)
 		} catch {
-			showToast('Connection error', 'XIcon')
+			showToast('Connection error', 'CircleXIcon')
 		}
 	}
 
@@ -38,7 +38,7 @@ export default function LastFmSettingsPage() {
 		} catch (_error) {
 			showToast(
 				`Failed to open web browser. Please visit: ${API_KEY_URL}`,
-				'XIcon',
+				'CircleXIcon',
 			)
 		}
 	}

@@ -5,10 +5,11 @@
 	"description": "View server information from the guild context menu.",
 	"author": "kmmiio99o",
 	"icon": "CircleInformationIcon",
-	"version": "1.1.1",
+	"version": "1.2.0",
 	"dependencies": {
 		"revenge.api": { "version": ">=1" },
-		"discord": { "version": "*" }
+		"discord": { "version": "*" },
+		"dev.kmmiio99o.lib": { "version": ">=1" }
 	},
 	"dist": {
 		"script": "index.js"

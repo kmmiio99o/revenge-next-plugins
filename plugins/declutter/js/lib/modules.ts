@@ -1,80 +1,34 @@
-import type { Filter } from '#lib/modules/finders/filters'
+let kmmiio: any
+const PLUGIN_ID = 'dev.kmmiio99o.declutter'
 
-function lazy<T>(resolve: () => T): () => T {
-	let value: T
-	let done = false
-	return () => {
-		if (!done) {
-			value = resolve()
-			done = true
-		}
-		return value
-	}
+export function initKmmiioLib(api: any) {
+	kmmiio = api
 }
 
-const byDefaultName = lazy(() =>
-	revenge.modules.finders.filters.createFilterGenerator<[name: string]>(
-		([name], _id, exports: any, _initialized: boolean) =>
-			typeof exports?.default === 'function' && exports.default.name === name,
-		([name]) => `revenge.declutter.defaultName(${name})`,
-		revenge.modules.finders.filters.FilterScopes.Initialized,
-	),
-)
-
-const byProps = lazy(() =>
-	revenge.modules.finders.filters.createFilterGenerator<[props: string[]]>(
-		([props], _id, exports: any, _initialized: boolean) =>
-			exports != null &&
-			(typeof exports === 'object' || typeof exports === 'function') &&
-			props.every(prop => prop in exports),
-		([props]) => `revenge.declutter.props(${props.join(',')})`,
-		revenge.modules.finders.filters.FilterScopes.Initialized,
-	),
-)
-
-const byProfileFrameComponent = lazy(() =>
-	revenge.modules.finders.filters.createFilterGenerator<[]>(
-		(_args, _id, exports: any, _initialized: boolean) =>
-			typeof exports?.default === 'function' &&
-			exports.default.name === 'ProfileFrame' &&
-			!('fromServer' in exports.default),
-		() => `revenge.declutter.profileFrameComponent`,
-		revenge.modules.finders.filters.FilterScopes.Initialized,
-	),
-)
+function log(module: string, action: string, found: boolean) {
+	kmmiio?.logUsage?.(PLUGIN_ID, module, action, found)
+}
 
 export function getDefaultNameFilter(name: string) {
-	return byDefaultName()(name)
+	const result = kmmiio?.getDefaultNameFilter(name)
+	log('filter:defaultName', 'create', result != null)
+	return result
 }
 
 export function getPropsFilter(...props: string[]) {
-	return byProps()(props)
+	const result = kmmiio?.getPropsFilter(...props)
+	log('filter:props', 'create', result != null)
+	return result
 }
 
 export function getProfileFrameComponentFilter() {
-	return byProfileFrameComponent()()
-}
-
-export function isComponentType(v: any): boolean {
-	if (typeof v === 'function') return true
-	if (v && typeof v === 'object') {
-		const t = v.$$typeof
-		return (
-			t === Symbol.for('react.memo') ||
-			t === Symbol.for('react.forward_ref') ||
-			t === Symbol.for('react.provider')
-		)
-	}
-	return false
+	const result = kmmiio?.getProfileFrameComponentFilter()
+	log('filter:profileFrame', 'create', result != null)
+	return result
 }
 
 export function resolveComponent(exports: any): any {
-	if (!exports) return undefined
-	if (isComponentType(exports)) return exports
-	if (isComponentType(exports?.default)) return exports.default
-	if (isComponentType(exports?.type)) return exports.type
-	if (isComponentType(exports?.default?.type)) return exports.default.type
-	return undefined
+	return kmmiio?.resolveComponent(exports)
 }
 
 export function safeInstead<
@@ -85,62 +39,43 @@ export function safeInstead<
 	key: Key,
 	hook: (args: any[], original: Parent[Key]) => any,
 ): () => void {
-	try {
-		return revenge.patcher.instead(parent, key, hook as any)
-	} catch {
-		return () => {}
-	}
+	const result = kmmiio?.safeInstead(parent, key, hook)
+	log('patcher:instead', 'patch', result != null && result !== (() => {}))
+	return result ?? (() => {})
 }
 
 export function safeInsteadJSX(
 	component: any,
 	hook: (args: any[], jsx: any) => any,
 ): () => void {
-	try {
-		return revenge.react.jsxRuntime.insteadJSX(component, hook)
-	} catch {
-		return () => {}
-	}
+	const result = kmmiio?.safeInsteadJSX(component, hook)
+	log('patcher:insteadJSX', 'patch', result != null && result !== (() => {}))
+	return result ?? (() => {})
 }
 
 export function safeAfterJSX(
 	component: any,
 	hook: (element: any) => any,
 ): () => void {
-	try {
-		return revenge.react.jsxRuntime.afterJSX(component, hook)
-	} catch {
-		return () => {}
-	}
+	const result = kmmiio?.safeAfterJSX(component, hook)
+	log('patcher:afterJSX', 'patch', result != null && result !== (() => {}))
+	return result ?? (() => {})
 }
 
 export function onModule(
-	filter: Filter,
+	filter: any,
 	cb: (namespace: any, id: number) => void,
 ): () => void {
-	try {
-		return revenge.modules.finders.getModules(
-			filter,
-			(namespace, id) => {
-				cb(namespace, id as number)
-			},
-			{ returnNamespace: true, max: 1 },
-		)
-	} catch {
-		return () => {}
-	}
+	const result = kmmiio?.onModule(filter, cb)
+	log('finder:onModule', 'subscribe', result != null && result !== (() => {}))
+	return result ?? (() => {})
 }
 
 export function onImportedPath<T = any>(
 	path: string,
 	cb: (namespace: T, id: number) => void,
 ): () => void {
-	try {
-		return revenge.discord.utils.modules.finders.getModuleWithImportedPath<T>(
-			path,
-			(namespace, id) => cb(namespace, id as number),
-		)
-	} catch {
-		return () => {}
-	}
+	const result = kmmiio?.onImportedPath(path, cb)
+	log('finder:onImportedPath', 'subscribe', result != null && result !== (() => {}))
+	return result ?? (() => {})
 }

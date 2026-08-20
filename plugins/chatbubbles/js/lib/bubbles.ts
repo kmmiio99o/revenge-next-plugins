@@ -1,3 +1,9 @@
+const PLUGIN_ID = 'dev.kmmiio99o.chatbubbles'
+
+function log(module: string, action: string, found: boolean) {
+	;(globalThis as any).__kmmiio?.logUsage?.(PLUGIN_ID, module, action, found)
+}
+
 export function isNativeAvailable(): boolean {
 	try {
 		return typeof revenge?.modules?.native?.callNativeMethod === 'function'
@@ -8,12 +14,16 @@ export function isNativeAvailable(): boolean {
 
 export function hookBubbles() {
 	if (!isNativeAvailable()) return Promise.resolve()
-	return revenge.modules.native.callNativeMethod('bubbles.hook', [])
+	const result = revenge.modules.native.callNativeMethod('bubbles.hook', [])
+	log('native', 'bubbles.hook', true)
+	return result
 }
 
 export function unhookBubbles() {
 	if (!isNativeAvailable()) return Promise.resolve()
-	return revenge.modules.native.callNativeMethod('bubbles.unhook', [])
+	const result = revenge.modules.native.callNativeMethod('bubbles.unhook', [])
+	log('native', 'bubbles.unhook', true)
+	return result
 }
 
 /**
@@ -34,9 +44,11 @@ export function configureBubbles(
 	bubbleColor?: number | null,
 ) {
 	if (!isNativeAvailable()) return Promise.resolve()
-	return revenge.modules.native.callNativeMethod('bubbles.configure', [
+	const result = revenge.modules.native.callNativeMethod('bubbles.configure', [
 		avatarRadius,
 		bubbleRadius,
 		bubbleColor == null ? null : bubbleColor.toString(),
 	])
+	log('native', 'bubbles.configure', true)
+	return result
 }

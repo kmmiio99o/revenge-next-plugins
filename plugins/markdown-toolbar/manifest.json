@@ -5,10 +5,11 @@
 	"description": "Floating markdown formatting bar under chat input.",
 	"author": "kmmiio99o",
 	"icon": "LettersIcon",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"dependencies": {
 		"revenge.api": { "version": ">=1" },
-		"discord": { "version": "*" }
+		"discord": { "version": "*" },
+		"dev.kmmiio99o.lib": { "version": ">=1" }
 	},
 	"dist": {
 		"script": "index.js"

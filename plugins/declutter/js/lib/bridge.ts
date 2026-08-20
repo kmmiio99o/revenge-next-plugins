@@ -1,5 +1,11 @@
 import { getSettings } from './state'
 
+const PLUGIN_ID = 'dev.kmmiio99o.declutter'
+
+function log(module: string, action: string, found: boolean) {
+	;(globalThis as any).__kmmiio?.logUsage?.(PLUGIN_ID, module, action, found)
+}
+
 /**
  * Push the chat-side toggles to the native `MessageView` hooks
  *
@@ -10,6 +16,7 @@ export function configureDeclutter(
 	hideAvatarDecorations: boolean,
 	hideServerTags: boolean,
 ) {
+	log('native', 'declutter.configure', true)
 	return revenge.modules.native.callNativeMethod('declutter.configure', [
 		hideAvatarDecorations,
 		hideServerTags,

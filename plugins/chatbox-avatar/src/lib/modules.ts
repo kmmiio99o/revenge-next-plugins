@@ -1,304 +1,82 @@
-import { discordModules } from '@shared'
+let kmmiio: any
+const PLUGIN_ID = 'dev.kmmiio99o.chatbox-avatar'
 
-const MODULE_PATHS = {
-	showUserProfileActionSheet:
-		'modules/user_profile/native/showUserProfileActionSheet.tsx',
-	showYouAccountActionSheet:
-		'modules/main_tabs_v2/native/tabs/you/utils/showYouAccountActionSheet.tsx',
-	YouAccountActionSheet:
-		'modules/main_tabs_v2/native/tabs/you/YouAccountActionSheet.tsx',
-} as const
-
-function moduleId(name: keyof typeof MODULE_PATHS): number {
-	const id = discordModules[MODULE_PATHS[name]]
-	if (typeof id !== 'number') {
-		throw new Error(
-			`chatbox-avatar: missing module id for "${MODULE_PATHS[name]}" in discord-modules.ts`,
-		)
-	}
-	return id
+export function initKmmiioLib(api: any) {
+	kmmiio = api
 }
 
-function createModuleGetter<T>(
-	filter: any,
-	resolve: (exports: any) => T | undefined,
-): () => T | undefined {
-	const { getModules, lookupModule } = revenge.modules.finders
-
-	let cached: T | undefined
-	let done = false
-	let unsub: (() => void) | undefined
-
-	try {
-		unsub = getModules(filter, (exports: any) => {
-			try {
-				const resolved = resolve(exports)
-				if (resolved !== undefined) {
-					cached = resolved
-					done = true
-					unsub?.()
-				}
-			} catch {}
-		})
-	} catch {}
-
-	return () => {
-		if (done) return cached
-		try {
-			const resolved = resolve(lookupModule(filter)?.[0])
-			if (resolved !== undefined) {
-				cached = resolved
-				done = true
-			}
-		} catch {}
-		return cached
-	}
+function log(module: string, action: string, found: boolean) {
+	kmmiio?.logUsage?.(PLUGIN_ID, module, action, found)
 }
 
-function createStoreGetter(name: string): () => any {
-	const { getStore, Stores } = revenge.discord.flux
-
-	let cached: any
-	let done = false
-	let unsub: (() => void) | undefined
-
-	try {
-		unsub = getStore(name, (store: any) => {
-			cached = store
-			done = true
-			unsub?.()
-		})
-	} catch {}
-
-	return () => {
-		if (done) return cached
-		try {
-			const viaProxy = (Stores as any)[name]
-			if (viaProxy) {
-				cached = viaProxy
-				done = true
-			}
-		} catch {}
-		return cached
-	}
+export function getDisplayNameFilter(name: string) {
+	const result = kmmiio?.getDisplayNameFilter(name)
+	log('filter:displayName', 'create', result != null)
+	return result
 }
-
-const displayNameFilter = (() => {
-	let value: any
-	let done = false
-	return () => {
-		if (!done) {
-			value = revenge.modules.finders.filters.createFilterGenerator<
-				[name: string]
-			>(
-				([name], _id, exports: any, _initialized: boolean) =>
-					exports?.type?.displayName === name ||
-					exports?.name === name ||
-					exports?.default?.type?.displayName === name ||
-					exports?.default?.name === name,
-				([name]) => `revenge.displayName(${name})`,
-				revenge.modules.finders.filters.FilterScopes.Initialized,
-			)
-			done = true
-		}
-		return value
-	}
-})()
 
 export function isComponentType(v: any): boolean {
-	if (typeof v === 'function') return true
-	if (v && typeof v === 'object') {
-		const t = v.$$typeof
-		return (
-			t === Symbol.for('react.memo') ||
-			t === Symbol.for('react.forward_ref') ||
-			t === Symbol.for('react.provider')
-		)
-	}
-	return false
+	return kmmiio?.isComponentType(v) ?? false
 }
 
 export function resolveComponent(exports: any): any {
-	if (!exports) return undefined
-	if (isComponentType(exports)) return exports
-	if (isComponentType(exports?.default)) return exports.default
-	if (isComponentType(exports?.type)) return exports.type
-	if (isComponentType(exports?.default?.type)) return exports.default.type
-	return undefined
-}
-
-// design/void/Avatar/native/Avatar.tsx (module 13295)
-// Exports: { default: Avatar, AvatarSizes, getStatusSize }
-const avatar = createModuleGetter<any>(
-	revenge.modules.finders.filters.withProps(
-		'default',
-		'AvatarSizes',
-		'getStatusSize',
-	),
-	exports => resolveComponent(exports),
-)
-
-// modules/user_profile/native/showUserProfileActionSheet.tsx (module 8929)
-// Exports: { default: showUserProfileActionSheet, getUserProfileActionSheetKey, ... }
-const profileSheetFn = createModuleGetter<any>(
-	revenge.modules.finders.filters.withProps(
-		'showUserProfileActionSheetPostConnection',
-	),
-	exports => {
-		if (typeof exports === 'function') return exports
-		if (typeof exports?.default === 'function') return exports.default
-		if (typeof exports?.showUserProfileActionSheet === 'function') {
-			return exports.showUserProfileActionSheet
-		}
-		return undefined
-	},
-)
-
-// modules/main_tabs_v2/native/tabs/you/utils/showYouAccountActionSheet.tsx (module 15629)
-// Exports: { showYouAccountActionSheet }
-const accountSheetFn = createModuleGetter<any>(
-	revenge.modules.finders.filters.withProps('showYouAccountActionSheet'),
-	exports =>
-		typeof exports?.showYouAccountActionSheet === 'function'
-			? exports.showYouAccountActionSheet
-			: undefined,
-)
-
-// modules/haptics/HapticUtils.native.tsx (module 4271)
-// Exports: { HapticFeedbackTypes, triggerHapticFeedback }
-const hapticsFn = createModuleGetter<any>(
-	revenge.modules.finders.filters.withProps('triggerHapticFeedback'),
-	exports =>
-		typeof exports?.triggerHapticFeedback === 'function'
-			? exports.triggerHapticFeedback
-			: undefined,
-)
-
-const hapticsTypes = createModuleGetter<any>(
-	revenge.modules.finders.filters.withProps('triggerHapticFeedback'),
-	exports => exports?.HapticFeedbackTypes ?? exports?.default,
-)
-
-const userStore = createStoreGetter('UserStore')
-const selfPresenceStore = createStoreGetter('SelfPresenceStore')
-const selectedChannelStore = createStoreGetter('SelectedChannelStore')
-const channelStore = createStoreGetter('ChannelStore')
-
-export function getDisplayNameFilter(name: string) {
-	return displayNameFilter()(name)
+	return kmmiio?.resolveComponent(exports)
 }
 
 export function getAvatar(): any {
-	return avatar()
+	const result = kmmiio?.getAvatar()
+	log('avatar', 'resolve', result != null)
+	return result
 }
+
 export function getUserStore(): any {
-	return userStore()
+	const result = kmmiio?.getUserStore()
+	log('store:UserStore', 'resolve', result != null)
+	return result
 }
+
 export function getSelfPresenceStore(): any {
-	return selfPresenceStore()
+	const result = kmmiio?.getSelfPresenceStore()
+	log('store:SelfPresenceStore', 'resolve', result != null)
+	return result
 }
+
 export function getSelectedChannelStore(): any {
-	return selectedChannelStore()
+	const result = kmmiio?.getSelectedChannelStore()
+	log('store:SelectedChannelStore', 'resolve', result != null)
+	return result
 }
+
 export function getChannelStore(): any {
-	return channelStore()
+	const result = kmmiio?.getChannelStore()
+	log('store:ChannelStore', 'resolve', result != null)
+	return result
 }
 
 export function getShowUserProfileActionSheet(): any {
-	return profileSheetFn()
+	const result = kmmiio?.getShowUserProfileActionSheet()
+	log('profileSheet', 'resolve', result != null)
+	return result
 }
+
 export function getTriggerHapticFeedback(): any {
-	return hapticsFn()
+	const result = kmmiio?.getTriggerHapticFeedback()
+	log('haptics', 'resolve', result != null)
+	return result
 }
+
 export function getHapticFeedbackTypes(): any {
-	return hapticsTypes()
+	const result = kmmiio?.getHapticFeedbackTypes()
+	log('hapticsTypes', 'resolve', result != null)
+	return result
 }
-
-const LAZY_SHEET_IDS = [
-	moduleId('showUserProfileActionSheet'),
-	moduleId('showYouAccountActionSheet'),
-	moduleId('YouAccountActionSheet'),
-]
-
-let lazySheetsLoaded = false
 
 export function forceLoadLazySheets(): void {
-	if (lazySheetsLoaded) return
-
-	const { lookupModule } = revenge.modules.finders
-	const { withProps } = revenge.modules.finders.filters
-
-	const forceInit = (filter: any) => {
-		try {
-			lookupModule(filter, { initialize: true })
-		} catch (e) {
-			console.log('[chatbox-avatar] forceInit error:', e)
-		}
-	}
-
-	forceInit(withProps('showUserProfileActionSheetPostConnection'))
-	forceInit(withProps('showYouAccountActionSheet'))
-
-	const requireFn = (globalThis as any)?.__r
-	if (typeof requireFn === 'function') {
-		for (const id of LAZY_SHEET_IDS) {
-			try {
-				requireFn(id)
-			} catch (e) {
-				console.log('[chatbox-avatar] __r error:', id, e)
-			}
-		}
-	}
-
-	lazySheetsLoaded = true
+	kmmiio?.forceLoadLazySheets()
+	log('sheets:lazyLoad', 'forceLoad', true)
 }
 
-// Discord loads the You-tab modules lazily through asyncRequire (module 2007),
-// never a plain synchronous require. Mirror that.
-function requireLazy(id: number): Promise<any> {
-	const r = (globalThis as any)?.__r
-	if (typeof r !== 'function') return Promise.resolve(undefined)
-
-	// asyncRequire(moduleId, paths?) -> Promise<namespace>. Without paths it
-	// falls back to importAll(moduleId) = metroRequire(moduleId).
-	const mod = (() => {
-		try {
-			return r(2007)
-		} catch {
-			return undefined
-		}
-	})()
-	const fn = mod?.default ?? mod
-	if (typeof fn === 'function') {
-		try {
-			const p = fn(id)
-			if (p && typeof p.then === 'function') return p
-		} catch {}
-	}
-
-	try {
-		return Promise.resolve(r(id))
-	} catch {
-		return Promise.resolve(undefined)
-	}
-}
-
-export function openAccountSheet(_userId: string, _channelId?: string) {
-	try {
-		// replicate YouBar — require the showYouAccountActionSheet module
-		// via asyncRequire and call its showYouAccountActionSheet() with no args.
-		requireLazy(moduleId('showYouAccountActionSheet'))
-			.then(ns => {
-				if (ns && typeof ns.showYouAccountActionSheet === 'function') {
-					ns.showYouAccountActionSheet()
-					return
-				}
-				forceLoadLazySheets()
-				const fn = accountSheetFn()
-				if (typeof fn === 'function') fn()
-			})
-			.catch(e => console.log('[chatbox-avatar] openAccountSheet error:', e))
-	} catch (e) {
-		console.log('[chatbox-avatar] openAccountSheet error:', e)
-	}
+export function openAccountSheet(userId: string, channelId?: string) {
+	kmmiio?.openAccountSheet(userId, channelId)
+	log('sheets:account', 'open', true)
 }

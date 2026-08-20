@@ -25,10 +25,10 @@ export default function ListenBrainzSettingsPage() {
 				isValid
 					? 'ListenBrainz connection successful!'
 					: 'ListenBrainz connection failed',
-				isValid ? 'CheckIcon' : 'XIcon',
+				isValid ? 'CircleCheckIcon' : 'CircleXIcon',
 			)
 		} catch {
-			showToast('Connection error', 'XIcon')
+			showToast('Connection error', 'CircleXIcon')
 		}
 	}
 
@@ -38,7 +38,7 @@ export default function ListenBrainzSettingsPage() {
 		} catch (_error) {
 			showToast(
 				`Failed to open web browser. Please visit: ${TOKEN_URL}`,
-				'XIcon',
+				'CircleXIcon',
 			)
 		}
 	}

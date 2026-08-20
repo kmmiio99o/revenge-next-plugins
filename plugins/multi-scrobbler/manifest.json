@@ -5,10 +5,11 @@
 	"description": "Show off your music status from Last.fm, Libre.fm, or ListenBrainz on your Discord profile with comprehensive console logging.",
 	"author": "kmmiio99o",
 	"icon": "MusicIcon",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"dependencies": {
 		"revenge.api": { "version": ">=1" },
-		"discord": { "version": "*" }
+		"discord": { "version": "*" },
+		"dev.kmmiio99o.lib": { "version": ">=1" }
 	},
 	"dist": {
 		"script": "index.js"
