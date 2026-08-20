@@ -33,19 +33,22 @@
       "author": "kmmiio99o",
       "icon": "UserSquareIcon",
       "channels": {
-        "latest": "1.1.6"
+        "latest": "1.2.0"
       },
       "versions": {
-        "1.1.6": {
+        "1.2.0": {
           "url": "https://rn.kmmiio99o.dev/dev.kmmiio99o.chatbox-avatar.zip",
-          "sha256": "27d7688377a9449b7cf2a66f02dcd8fefe19011f48fb9dc75dcad459375884d9",
-          "size": 3042,
+          "sha256": "15c953c7532fcd7b142c2a04e47a287caebd1f4580584b9264a4e7454af8fd05",
+          "size": 2366,
           "dependencies": {
             "revenge.api": {
               "version": ">=1"
             },
             "discord": {
               "version": "*"
+            },
+            "dev.kmmiio99o.lib": {
+              "version": ">=1"
             }
           }
         }
@@ -57,19 +60,22 @@
       "author": "kmmiio99o",
       "icon": "ChatIcon",
       "channels": {
-        "latest": "1.0.3"
+        "latest": "1.1.0"
       },
       "versions": {
-        "1.0.3": {
+        "1.1.0": {
           "url": "https://rn.kmmiio99o.dev/dev.kmmiio99o.chatbubbles.zip",
-          "sha256": "cf5413a52fa012ed9b887c65621f17734128c263f9ddef1dcccce450481c4357",
-          "size": 14305,
+          "sha256": "33f77b8ded5d5cf0d7851d0c71fc81c1d7d496f82d7febfb2ea58e0f422f99d7",
+          "size": 2461,
           "dependencies": {
             "revenge.api": {
               "version": ">=1"
             },
             "discord": {
               "version": "*"
+            },
+            "dev.kmmiio99o.lib": {
+              "version": ">=1"
             }
           }
         }
@@ -81,13 +87,40 @@
       "author": "kmmiio99o",
       "icon": "SlashIcon",
       "channels": {
-        "latest": "1.0.2"
+        "latest": "1.1.0"
       },
       "versions": {
-        "1.0.2": {
+        "1.1.0": {
           "url": "https://rn.kmmiio99o.dev/dev.kmmiio99o.declutter.zip",
-          "sha256": "dc6fab53aa91acf56f7a9c3a42e680b45f31e20e238b6f12b6df703a2d3b5714",
-          "size": 8012,
+          "sha256": "271470c80f7bf4f622ecb360ef87101a9c1eb453cea70ac2be4776876add9b92",
+          "size": 3254,
+          "dependencies": {
+            "revenge.api": {
+              "version": ">=1"
+            },
+            "discord": {
+              "version": "*"
+            },
+            "dev.kmmiio99o.lib": {
+              "version": ">=1"
+            }
+          }
+        }
+      }
+    },
+    "dev.kmmiio99o.lib": {
+      "name": "kmmiio Library",
+      "description": "Shared utility modules and native hooks for kmmiio99o plugins.",
+      "author": "kmmiio99o",
+      "icon": "SettingsIcon",
+      "channels": {
+        "latest": "1.0.0"
+      },
+      "versions": {
+        "1.0.0": {
+          "url": "https://rn.kmmiio99o.dev/dev.kmmiio99o.lib.zip",
+          "sha256": "836f7207d515628364e4cda53b9a5233dffc7613df67c563c243c77e97a2d76b",
+          "size": 19455,
           "dependencies": {
             "revenge.api": {
               "version": ">=1"
@@ -105,19 +138,22 @@
       "author": "kmmiio99o",
       "icon": "LettersIcon",
       "channels": {
-        "latest": "1.0.0"
+        "latest": "1.1.0"
       },
       "versions": {
-        "1.0.0": {
+        "1.1.0": {
           "url": "https://rn.kmmiio99o.dev/dev.kmmiio99o.markdown.toolbar.zip",
-          "sha256": "47bcab6e2ef385fd5af5726b851f0908a36eb875c9409f6d3e763e5a9d753b1b",
-          "size": 2195,
+          "sha256": "f00d9ce92618bd28d8b0acad67d9a7bc683356b344de96d7486db93ab1ae4d36",
+          "size": 2205,
           "dependencies": {
             "revenge.api": {
               "version": ">=1"
             },
             "discord": {
               "version": "*"
+            },
+            "dev.kmmiio99o.lib": {
+              "version": ">=1"
             }
           }
         }
@@ -129,19 +165,22 @@
       "author": "kmmiio99o",
       "icon": "MusicIcon",
       "channels": {
-        "latest": "1.0.1"
+        "latest": "1.1.0"
       },
       "versions": {
-        "1.0.1": {
+        "1.1.0": {
           "url": "https://rn.kmmiio99o.dev/dev.kmmiio99o.multi-scrobbler.zip",
-          "sha256": "2c2dc09949fb02a606f57599fc169e00b42072b206c84412f5787f2e095cbbfc",
-          "size": 13238,
+          "sha256": "697d72399bb2e5d049a42513208d5b07b436d8b033a73053f531f102f319988e",
+          "size": 13345,
           "dependencies": {
             "revenge.api": {
               "version": ">=1"
             },
             "discord": {
               "version": "*"
+            },
+            "dev.kmmiio99o.lib": {
+              "version": ">=1"
             }
           }
         }
@@ -153,19 +192,22 @@
       "author": "kmmiio99o",
       "icon": "CircleInformationIcon",
       "channels": {
-        "latest": "1.1.1"
+        "latest": "1.2.0"
       },
       "versions": {
-        "1.1.1": {
+        "1.2.0": {
           "url": "https://rn.kmmiio99o.dev/dev.kmmiio99o.server-info.zip",
-          "sha256": "1bbc7919aeffac34edfc010f8710953e93bdc9ef692f46c290db81f4ddc82ac7",
-          "size": 4627,
+          "sha256": "855bbfb3e7fe28dfd3ebb7266de787c611df9ec9eb143e81f43b9549e6b7bb8f",
+          "size": 4378,
           "dependencies": {
             "revenge.api": {
               "version": ">=1"
             },
             "discord": {
               "version": "*"
+            },
+            "dev.kmmiio99o.lib": {
+              "version": ">=1"
             }
           }
         }
