@@ -1,5 +1,6 @@
 import { patchAvatarDecorations } from './avatarDecorations'
 import { patchBadges } from './badges'
+import { patchBoostGoal } from './boostGoal'
 import { patchNameplates } from './nameplates'
 import { patchProfileEffects } from './profileEffects'
 import { patchProfileFrames } from './profileFrames'
@@ -20,6 +21,7 @@ export function patchAll(): () => void {
 	unpatch.push(patchSettingsPage())
 	unpatch.push(patchWishlist())
 	unpatch.push(patchYouDock())
+	unpatch.push(patchBoostGoal())
 
 	return () => {
 		for (const un of unpatch) un?.()

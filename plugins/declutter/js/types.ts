@@ -25,4 +25,6 @@ export interface DeclutterSettings {
 	premiumSettings: boolean
 	/** Hide Wishlist tab on user profiles */
 	wishlist: boolean
+	/** Hide Boost Goal bar in channel list */
+	boostGoal: boolean
 }

@@ -14,4 +14,5 @@ export const DEFAULTS: DeclutterSettings = {
 	youTabOrbsBalance: true,
 	premiumSettings: true,
 	wishlist: true,
+	boostGoal: true,
 }

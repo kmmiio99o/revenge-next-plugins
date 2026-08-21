@@ -94,6 +94,13 @@ export default function Settings({
 							label="Wishlist & Board"
 							subLabel="Wishlist & Board tabs on user profiles"
 						/>
+						<Toggle
+							s={s}
+							set={set}
+							key_="boostGoal"
+							label="Boost Goal"
+							subLabel="Server boost progress bar in channel list"
+						/>
 					</TableRowGroup>
 					<TableRowGroup title="Nitro">
 						<Toggle
