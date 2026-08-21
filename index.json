@@ -85,15 +85,15 @@
       "name": "Declutter",
       "description": "Hide profile clutter: avatar decorations, nameplates, profile effects, profile frames, server tags, and badges. Aswell as Nitro/Payment settings.",
       "author": "kmmiio99o",
-      "icon": "SlashIcon",
+      "icon": "MagicWandIcon",
       "channels": {
-        "latest": "1.1.0"
+        "latest": "1.1.1"
       },
       "versions": {
-        "1.1.0": {
+        "1.1.1": {
           "url": "https://rn.kmmiio99o.dev/dev.kmmiio99o.declutter.zip",
-          "sha256": "271470c80f7bf4f622ecb360ef87101a9c1eb453cea70ac2be4776876add9b92",
-          "size": 3254,
+          "sha256": "d9a3c2a822bc9d452da1b6941295ea36320e3dd4f0ecc04d04817139f11b0e63",
+          "size": 3606,
           "dependencies": {
             "revenge.api": {
               "version": ">=1"
