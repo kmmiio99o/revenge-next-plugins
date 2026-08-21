@@ -5,6 +5,7 @@ import { patchProfileEffects } from './profileEffects'
 import { patchProfileFrames } from './profileFrames'
 import { patchServerTags } from './serverTags'
 import { patchSettingsPage } from './settingsPage'
+import { patchWishlist } from './wishlist'
 import { patchYouDock } from './youDock'
 
 export function patchAll(): () => void {
@@ -17,6 +18,7 @@ export function patchAll(): () => void {
 	unpatch.push(patchServerTags())
 	unpatch.push(patchBadges())
 	unpatch.push(patchSettingsPage())
+	unpatch.push(patchWishlist())
 	unpatch.push(patchYouDock())
 
 	return () => {

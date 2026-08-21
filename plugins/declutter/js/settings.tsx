@@ -87,6 +87,13 @@ export default function Settings({
 							label="Profile Badges"
 							subLabel="Badges shown on user profiles"
 						/>
+						<Toggle
+							s={s}
+							set={set}
+							key_="wishlist"
+							label="Wishlist & Board"
+							subLabel="Wishlist & Board tabs on user profiles"
+						/>
 					</TableRowGroup>
 					<TableRowGroup title="Nitro">
 						<Toggle

@@ -23,4 +23,6 @@ export interface DeclutterSettings {
 	youTabOrbsBalance: boolean
 	/** Hide the whole Nitro/Payment category in User Settings */
 	premiumSettings: boolean
+	/** Hide Wishlist tab on user profiles */
+	wishlist: boolean
 }
