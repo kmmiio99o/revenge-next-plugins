@@ -17,6 +17,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.service.notification.NotificationListenerService
+import android.util.Log
 import dev.kmmiio99o.mediasession.data.Prefs
 import dev.kmmiio99o.mediasession.data.UpdateChecker
 import java.io.ByteArrayOutputStream
@@ -25,14 +26,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class MediaListenerService : NotificationListenerService() {
 
     companion object {
+        private const val TAG = "MediaListenerService"
+
         @Volatile
         var instance: MediaListenerService? = null
+            private set
+
+        @Volatile
+        var lastAliveTimestamp: Long = 0L
             private set
 
         private val COMMANDS = setOf("play", "pause", "playPause", "skipNext", "skipPrevious", "stop", "seekTo")
@@ -45,8 +53,10 @@ class MediaListenerService : NotificationListenerService() {
             this != null && (state == PlaybackState.STATE_PLAYING || state == PlaybackState.STATE_BUFFERING)
     }
 
+    @Volatile
     private var sessions: List<MediaController> = emptyList()
     private var registered: Boolean = false
+    private var sessionRefreshJob: Job? = null
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -55,23 +65,51 @@ class MediaListenerService : NotificationListenerService() {
 
     override fun onListenerConnected() {
         instance = this
+        lastAliveTimestamp = android.os.SystemClock.elapsedRealtime()
         registerSessionListener()
         refreshSessions()
         startUpdateChecks()
+        startSessionRefresh()
+        Log.d(TAG, "onListenerConnected: component=${ComponentName(this, javaClass).flattenToShortString()}, sessions=${sessions.size}")
     }
 
     override fun onListenerDisconnected() {
+        Log.d(TAG, "onListenerDisconnected: requesting rebind")
         unregisterSessionListener()
+        stopSessionRefresh()
         sessions = emptyList()
         instance = null
+        try {
+            android.service.notification.NotificationListenerService.requestRebind(ComponentName(this, javaClass))
+        } catch (_: Exception) {
+        }
     }
 
     override fun onDestroy() {
+        Log.d(TAG, "onDestroy")
         unregisterSessionListener()
+        stopSessionRefresh()
         serviceScope.cancel()
         if (instance === this) instance = null
+        lastAliveTimestamp = 0L
         sessions = emptyList()
         super.onDestroy()
+    }
+
+    private fun startSessionRefresh() {
+        stopSessionRefresh()
+        sessionRefreshJob = serviceScope.launch {
+            delay(2_000)
+            while (isActive) {
+                refreshSessions()
+                delay(3_000)
+            }
+        }
+    }
+
+    private fun stopSessionRefresh() {
+        sessionRefreshJob?.cancel()
+        sessionRefreshJob = null
     }
 
     private fun mediaSessionManager(): MediaSessionManager? =
@@ -107,13 +145,17 @@ class MediaListenerService : NotificationListenerService() {
         } catch (_: SecurityException) {
             emptyList()
         }
+        Log.d(TAG, "refreshSessions: ${sessions.size} active sessions")
     }
 
     private fun activeController(): MediaController? =
         sessions.firstOrNull { it.playbackState.isEffectivelyPlaying() } ?: sessions.firstOrNull()
 
     fun snapshot(): Bundle? {
-        val c = activeController() ?: return null
+        val c = activeController() ?: run {
+            Log.d(TAG, "snapshot: no active controller (sessions=${sessions.size})")
+            return null
+        }
         val meta = c.metadata
         val pb = c.playbackState
         val app = applicationInfo(c.packageName)
@@ -200,6 +242,7 @@ class MediaListenerService : NotificationListenerService() {
     private fun startUpdateChecks() {
         serviceScope.launch {
             while (isActive) {
+                lastAliveTimestamp = android.os.SystemClock.elapsedRealtime()
                 try {
                     checkAndNotifyUpdate()
                 } catch (_: Exception) {

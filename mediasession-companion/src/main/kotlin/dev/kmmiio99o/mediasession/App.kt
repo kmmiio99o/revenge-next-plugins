@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import dev.kmmiio99o.mediasession.data.ApkUpdater
 import dev.kmmiio99o.mediasession.data.MediaInfo
 import dev.kmmiio99o.mediasession.data.MediaRepository
+import dev.kmmiio99o.mediasession.data.OemAutostart
 import dev.kmmiio99o.mediasession.data.Prefs
 import dev.kmmiio99o.mediasession.data.UpdateChecker
 import dev.kmmiio99o.mediasession.ui.screens.HomeScreen
@@ -44,6 +45,7 @@ fun App(context: Context) {
 
     var canNotify by remember { mutableStateOf(canPostNotifications(context)) }
     var canInstall by remember { mutableStateOf(ApkUpdater.canInstall(context)) }
+    var batteryIgnored by remember { mutableStateOf(OemAutostart.isBatteryOptimizationsIgnored(context)) }
 
     var update by remember { mutableStateOf<UpdateChecker.RemoteUpdate?>(null) }
     var downloadProgress by remember { mutableStateOf<Float?>(null) }
@@ -54,8 +56,10 @@ fun App(context: Context) {
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
+        HealthCheckWorker.enqueue(context)
         while (true) {
             listenerEnabled = MediaRepository.isListenerEnabled(context)
+            batteryIgnored = OemAutostart.isBatteryOptimizationsIgnored(context)
             if (showOnboarding) {
                 canNotify = canPostNotifications(context)
                 canInstall = ApkUpdater.canInstall(context)
@@ -121,6 +125,7 @@ fun App(context: Context) {
                 if (onboarding) {
                     OnboardingScreen(
                         listenerGranted = listenerEnabled,
+                        batteryIgnored = batteryIgnored,
                         canNotify = canNotify,
                         canInstall = canInstall,
                         onDone = {

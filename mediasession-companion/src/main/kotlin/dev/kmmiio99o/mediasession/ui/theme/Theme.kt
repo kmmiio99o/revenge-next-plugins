@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialExpressiveTheme
+import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -21,15 +22,27 @@ fun MediaSessionBridgeTheme(
     val context = LocalContext.current
     val colorScheme = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && darkTheme -> dynamicDarkColorScheme(context)
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> dynamicLightColorScheme(context)
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !darkTheme -> dynamicLightColorScheme(context)
         darkTheme -> darkColorScheme()
         else -> lightColorScheme()
     }
 
+    val shapes = Shapes(
+        extraSmall = RoundedCornerShape(4.dp),
+        small = RoundedCornerShape(8.dp),
+        medium = RoundedCornerShape(12.dp),
+        large = RoundedCornerShape(16.dp),
+        extraLarge = RoundedCornerShape(28.dp),
+        largeIncreased = RoundedCornerShape(20.dp),
+        extraLargeIncreased = RoundedCornerShape(32.dp),
+        extraExtraLarge = RoundedCornerShape(48.dp),
+    )
+
     MaterialExpressiveTheme(
         colorScheme = colorScheme,
+        motionScheme = MotionScheme.expressive(),
         typography = AppTypography,
-        shapes = Shapes(extraLarge = RoundedCornerShape(32.dp)),
+        shapes = shapes,
         content = content,
     )
 }

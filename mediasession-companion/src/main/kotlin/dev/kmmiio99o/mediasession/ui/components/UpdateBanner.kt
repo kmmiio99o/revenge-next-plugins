@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,18 +25,21 @@ fun UpdateBanner(
     onDownload: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ElevatedCard(
+    OutlinedCard(
         modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.extraLarge,
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.outlinedCardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ),
+        border = CardDefaults.outlinedCardBorder().copy(
+            width = 1.dp,
         ),
     ) {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(
                 "Update available",
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
                 text = when {
@@ -46,15 +49,15 @@ fun UpdateBanner(
                     }
                 },
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             if (progress != null) {
                 LinearProgressIndicator(
                     progress = { progress },
                     modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    trackColor = MaterialTheme.colorScheme.primaryContainer,
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                 )
             } else {
                 if (error != null) {

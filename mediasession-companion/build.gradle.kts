@@ -42,4 +42,6 @@ dependencies {
     implementation(libs.activity.compose)
     implementation(libs.compose.material3)
     implementation(libs.compose.icons.core)
+    implementation(libs.work.runtime.ktx)
+    implementation(libs.core.ktx)
 }

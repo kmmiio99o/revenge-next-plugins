@@ -9,6 +9,7 @@ import android.content.ContentValues
 import android.content.UriMatcher
 import android.database.Cursor
 import android.net.Uri
+import android.util.Log
 
 class MediaSessionProvider : ContentProvider() {
 
@@ -33,6 +34,7 @@ class MediaSessionProvider : ContentProvider() {
 
     override fun call(method: String, arg: String?, extras: Bundle?): Bundle? {
         val svc = MediaListenerService.instance
+        Log.d("MediaSessionProvider", "call($method): instance=${svc != null}, enabled=${isListenerEnabled()}")
         return when (method) {
             "getMediaInfo" -> svc?.snapshot() ?: Bundle()
             "isListenerEnabled" -> Bundle().apply { putBoolean("enabled", isListenerEnabled()) }
@@ -45,12 +47,11 @@ class MediaSessionProvider : ContentProvider() {
     }
 
     private fun isListenerEnabled(): Boolean {
-        if (MediaListenerService.instance != null) return true
         val ctx = context ?: return false
         val raw = Settings.Secure.getString(ctx.contentResolver, "enabled_notification_listeners") ?: ""
         return raw.split(":").any {
             ComponentName.unflattenFromString(it)?.let { cn ->
-                cn.packageName == context!!.packageName && cn.className.endsWith("MediaListenerService")
+                cn.packageName == ctx.packageName && cn.className.endsWith("MediaListenerService")
             } == true
         }
     }

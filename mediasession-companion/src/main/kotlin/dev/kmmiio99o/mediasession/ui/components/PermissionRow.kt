@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,20 +29,23 @@ fun PermissionRow(
     onAction: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ElevatedCard(
+    Card(
         modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.elevatedCardColors(
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
             containerColor = if (granted == true) {
                 MaterialTheme.colorScheme.surfaceContainerLow
             } else {
-                MaterialTheme.colorScheme.surfaceContainerHighest
+                MaterialTheme.colorScheme.surfaceContainerHigh
             },
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (granted == true) 0.dp else 1.dp,
         ),
     ) {
         Row(
-            Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             when (granted) {
