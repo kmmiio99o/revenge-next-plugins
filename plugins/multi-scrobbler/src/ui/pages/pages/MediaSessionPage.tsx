@@ -125,9 +125,9 @@ export default function MediaSessionPage() {
 	}
 
 	const getStatusColor = () => {
-		if (bridgeActive) return 'text-positive'
-		if (listenerOk) return 'text-warning'
-		return 'text-danger'
+		if (bridgeActive) return 'text-feedback-positive'
+		if (listenerOk) return 'text-feedback-warning'
+		return 'text-feedback-critical'
 	}
 
 	return (
@@ -139,9 +139,9 @@ export default function MediaSessionPage() {
 							label="Status"
 							subLabel={getStatusText()}
 							trailing={
-								<Text variant="text-sm/medium" style={{ color: getStatusColor() }}>
-									{bridgeActive ? 'Active' : 'Inactive'}
-								</Text>
+							<Text variant="text-sm/medium" color={getStatusColor()}>
+								{bridgeActive ? 'Active' : 'Inactive'}
+							</Text>
 							}
 						/>
 						{!companionInstalled && (
