@@ -69,13 +69,8 @@ jobs:
           cd revenge-xposed
           ./gradlew :api:publishToMavenLocal --no-daemon
 
-      - name: Build all plugins
-        run: |
-          ./gradlew packageAllPlugins --no-daemon
-
-      - name: Generate repository index
-        run: |
-          bunx revenge-plugin generate-index --dist dist --base-url "https://rn.kmmiio99o.dev" --out dist/index.json
+      - name: Build and generate index
+        run: bun run release --base-url "https://rn.kmmiio99o.dev"
 
       - name: Verify dist artifacts
         run: |
@@ -92,4 +87,4 @@ jobs:
           force_orphan: false
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_message: 'chore: publish plugin zips [skip ci]'
+          commit_message: 'chore: publish plugins [skip ci]'

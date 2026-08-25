@@ -7,6 +7,8 @@
 		"build:dev": "revenge-plugin build --dev",
 		"generate-index": "revenge-plugin generate-index",
 		"serve": "revenge-plugin serve",
+		"version": "bun scripts/version.ts",
+		"release": "bun scripts/release.ts",
 		"gen:icons": "node scripts/gen-iconify-barrel.mjs",
 		"update:ids": "bun scripts/update-discord-module-ids.mjs",
 		"lint": "biome check",
