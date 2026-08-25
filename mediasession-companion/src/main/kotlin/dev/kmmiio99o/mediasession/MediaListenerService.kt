@@ -1,18 +1,12 @@
 package dev.kmmiio99o.mediasession
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.media.MediaMetadata
 import android.media.session.MediaController
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -43,11 +37,8 @@ class MediaListenerService : NotificationListenerService() {
         var lastAliveTimestamp: Long = 0L
             private set
 
-        private val COMMANDS = setOf("play", "pause", "playPause", "skipNext", "skipPrevious", "stop", "seekTo")
-
         private const val UPDATE_CHECK_INTERVAL_MS = 6L * 60 * 60 * 1000
-        private const val CHANNEL_UPDATES = "updates"
-        private const val NOTIFICATION_ID_UPDATE = 1001
+        private val COMMANDS = setOf("play", "pause", "playPause", "skipNext", "skipPrevious", "stop", "seekTo")
 
         private fun PlaybackState?.isEffectivelyPlaying(): Boolean =
             this != null && (state == PlaybackState.STATE_PLAYING || state == PlaybackState.STATE_BUFFERING)
@@ -256,47 +247,6 @@ class MediaListenerService : NotificationListenerService() {
         val remote = UpdateChecker.latest() ?: return
         if (remote.versionCode <= UpdateChecker.installedVersionCode(this)) return
         if (Prefs.lastNotifiedUpdate(this) == remote.versionCode) return
-
-        postUpdateNotification(remote)
         Prefs.setLastNotifiedUpdate(this, remote.versionCode)
-    }
-
-    private fun canPostNotifications(): Boolean =
-        Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
-                checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
-
-    private fun postUpdateNotification(remote: UpdateChecker.RemoteUpdate) {
-        if (!canPostNotifications()) return
-
-        val nm = getSystemService(NotificationManager::class.java) ?: return
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            nm.createNotificationChannel(
-                NotificationChannel(CHANNEL_UPDATES, "App updates", NotificationManager.IMPORTANCE_DEFAULT),
-            )
-        }
-
-        val openApp = PendingIntent.getActivity(
-            this,
-            0,
-            Intent(this, MainActivity::class.java),
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
-        )
-
-        val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Notification.Builder(this, CHANNEL_UPDATES)
-        } else {
-            @Suppress("DEPRECATION") Notification.Builder(this)
-        }
-        builder
-            .setSmallIcon(R.drawable.ic_music_note)
-            .setContentTitle("MediaSession Bridge update")
-            .setContentText(
-                if (remote.versionName.isNotBlank()) "Version ${remote.versionName} is available — tap to update."
-                else "A new version is available — tap to update.",
-            )
-            .setAutoCancel(true)
-            .setContentIntent(openApp)
-
-        nm.notify(NOTIFICATION_ID_UPDATE, builder.build())
     }
 }

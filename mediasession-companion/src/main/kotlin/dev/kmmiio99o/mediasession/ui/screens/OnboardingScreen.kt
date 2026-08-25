@@ -1,11 +1,8 @@
 package dev.kmmiio99o.mediasession.ui.screens
 
-import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -43,15 +40,10 @@ import dev.kmmiio99o.mediasession.ui.components.PermissionRow
 fun OnboardingScreen(
     listenerGranted: Boolean?,
     batteryIgnored: Boolean?,
-    canNotify: Boolean,
     canInstall: Boolean,
     onDone: () -> Unit,
 ) {
     val context = LocalContext.current
-
-    val notifyPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission(),
-    ) {}
 
     var showAutostartInstructions by remember { mutableStateOf(false) }
 
@@ -96,18 +88,6 @@ fun OnboardingScreen(
                 context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
             },
         )
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            PermissionRow(
-                title = "Notifications",
-                description = "Alert you when an app update is available.",
-                granted = canNotify,
-                actionLabel = "Allow",
-                onAction = {
-                    notifyPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                },
-            )
-        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             PermissionRow(

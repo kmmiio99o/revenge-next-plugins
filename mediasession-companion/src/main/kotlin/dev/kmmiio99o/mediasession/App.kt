@@ -2,7 +2,6 @@ package dev.kmmiio99o.mediasession
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -43,7 +42,6 @@ fun App(context: Context) {
 
     val showOnboarding = !dismissedThisSession && (!onboarded || listenerEnabled == false)
 
-    var canNotify by remember { mutableStateOf(canPostNotifications(context)) }
     var canInstall by remember { mutableStateOf(ApkUpdater.canInstall(context)) }
     var batteryIgnored by remember { mutableStateOf(OemAutostart.isBatteryOptimizationsIgnored(context)) }
 
@@ -61,7 +59,6 @@ fun App(context: Context) {
             listenerEnabled = MediaRepository.isListenerEnabled(context)
             batteryIgnored = OemAutostart.isBatteryOptimizationsIgnored(context)
             if (showOnboarding) {
-                canNotify = canPostNotifications(context)
                 canInstall = ApkUpdater.canInstall(context)
             }
             delay(1_000)
@@ -126,7 +123,6 @@ fun App(context: Context) {
                     OnboardingScreen(
                         listenerGranted = listenerEnabled,
                         batteryIgnored = batteryIgnored,
-                        canNotify = canNotify,
                         canInstall = canInstall,
                         onDone = {
                             Prefs.markOnboarded(context)
@@ -154,8 +150,3 @@ fun App(context: Context) {
         }
     }
 }
-
-private fun canPostNotifications(context: Context): Boolean =
-    Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
-            context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) ==
-            android.content.pm.PackageManager.PERMISSION_GRANTED
