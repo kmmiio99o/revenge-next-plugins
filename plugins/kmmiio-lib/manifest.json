@@ -7,8 +7,12 @@
 	"icon": "SettingsIcon",
 	"version": "1.0.1",
 	"dependencies": {
-		"revenge.api": { "version": ">=1" },
-		"discord": { "version": "*" }
+		"revenge.api": {
+			"version": ">=1"
+		},
+		"discord": {
+			"version": "*"
+		}
 	},
 	"dist": {
 		"script": "index.js",

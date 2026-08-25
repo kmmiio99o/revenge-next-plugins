@@ -87,8 +87,9 @@ async function bumpDependentVersions() {
 	for (const entry of await readdir(PLUGINS_DIR, { withFileTypes: true })) {
 		if (!entry.isDirectory() || entry.name === 'shared') continue
 		const src = join(PLUGINS_DIR, entry.name, 'src')
+		const js = join(PLUGINS_DIR, entry.name, 'js')
 		if (!existsSync(join(PLUGINS_DIR, entry.name, 'manifest.json'))) continue
-		if (await importsSharedStore(src)) dependents.push(entry.name)
+		if ((await importsSharedStore(src)) || (await importsSharedStore(js))) dependents.push(entry.name)
 	}
 
 	for (const name of dependents) {
@@ -110,7 +111,8 @@ async function importsSharedStore(dir) {
 		if (entry.isDirectory()) {
 			if (await importsSharedStore(full)) return true
 		} else if (/\.(ts|tsx|js|jsx)$/.test(entry.name)) {
-			if ((await readFile(full, 'utf8')).includes('shared/discord-modules'))
+			const src = await readFile(full, 'utf8')
+			if (src.includes('shared/discord-modules') || src.includes('@shared'))
 				return true
 		}
 	}
