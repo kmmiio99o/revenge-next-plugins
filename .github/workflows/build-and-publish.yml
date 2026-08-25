@@ -30,7 +30,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          api-level: 36
+          api-level: 37
           build-tools: '37.0.0'
           ndk-version: 'r27c'
 
@@ -60,7 +60,7 @@ jobs:
         with:
           path: |
             /opt/hostedtoolcache/android
-          key: android-sdk-${{ runner.os }}-36-37.0.0
+          key: android-sdk-${{ runner.os }}-37-37.0.0
           restore-keys: |
             android-sdk-${{ runner.os }}-
 

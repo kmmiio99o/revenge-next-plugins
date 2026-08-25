@@ -1,5 +1,9 @@
 import { SPONSORS_URL, GITHUB_URL, WEBSITE_URL, AVATAR_URL } from './constants'
 
+const { Dimensions } = revenge.react.ReactNative
+const { width: SCREEN_WIDTH } = Dimensions.get('window')
+const AVATAR_SIZE = Math.min(80, Math.round(SCREEN_WIDTH * 0.15))
+
 const styles = {
 	background: {
 		position: 'absolute' as const,
@@ -9,13 +13,13 @@ const styles = {
 		height: '100%' as const,
 	},
 	avatar: {
-		width: 80,
-		height: 80,
-		borderRadius: 40,
+		width: AVATAR_SIZE,
+		height: AVATAR_SIZE,
+		borderRadius: AVATAR_SIZE / 2,
 	},
 	avatarWrapper: {
-		width: 80,
-		height: 80,
+		width: AVATAR_SIZE,
+		height: AVATAR_SIZE,
 	},
 }
 
@@ -96,7 +100,7 @@ export default function DonateCard({ onAvatarPress }: { onAvatarPress: () => voi
 							You can support the development of my plugins by sponsoring on GitHub!
 						</Text>
 					</View>
-					<Stack spacing={8} direction="horizontal" style={{ alignItems: 'center' }}>
+					<View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
 						<Button
 							size="sm"
 							icon={revenge.assets.getAssetIdByName('HeartIcon')}
@@ -120,7 +124,7 @@ export default function DonateCard({ onAvatarPress }: { onAvatarPress: () => voi
 							variant="tertiary"
 							onPress={() => Linking.openURL(WEBSITE_URL)}
 						/>
-					</Stack>
+					</View>
 				</View>
 				<Pressable
 					onPress={onPressAvatar}
@@ -129,14 +133,14 @@ export default function DonateCard({ onAvatarPress }: { onAvatarPress: () => voi
 					style={styles.avatarWrapper}
 					hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
 				>
-					<Animated.View
-						style={{
-							width: 80,
-							height: 80,
-							borderRadius: 40,
-							transform: [{ rotate }, { scale: scaleAnim }],
-						}}
-					>
+				<Animated.View
+					style={{
+						width: AVATAR_SIZE,
+						height: AVATAR_SIZE,
+						borderRadius: AVATAR_SIZE / 2,
+						transform: [{ rotate }, { scale: scaleAnim }],
+					}}
+				>
 						<Image
 							source={{ uri: AVATAR_URL }}
 							style={styles.avatar}

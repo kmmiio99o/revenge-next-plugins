@@ -11,11 +11,29 @@ minSdk = "24"
 targetSdk = "36"
 javaVersion = "25"
 
+composeBom = "2026.08.00"
+activityCompose = "1.13.0"
+workRuntime = "2.10.1"
+coreKtx = "1.15.0"
+
+# Companion Android app (:mediasession-companion) release metadata.
+companionAppVersion = "1.0.0"
+companionAppCode = "1000"
+
 [libraries]
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 xposed-api = { module = "de.robv.android.xposed:api", version.ref = "xposed" }
 revenge-api = { module = "io.github.revenge:api", version.ref = "revengeApi" }
 
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+compose-material3 = { module = "androidx.compose.material3:material3", version = "1.5.0-alpha26" }
+compose-icons-core = { module = "androidx.compose.material:material-icons-core", version = "1.7.8" }
+work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntime" }
+core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+
 [plugins]
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

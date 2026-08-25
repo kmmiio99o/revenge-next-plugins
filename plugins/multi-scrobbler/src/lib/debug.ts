@@ -26,14 +26,15 @@ const debugInfo = {} as {
 debugInfo.componentMountErrors = []
 debugInfo.componentMountCount = 0
 debugInfo.settingsLoadAttempts = 0
-debugInfo.serviceErrors = { lastfm: [], librefm: [], listenbrainz: [] }
+debugInfo.serviceErrors = { lastfm: [], librefm: [], listenbrainz: [], mediasession: [] }
 debugInfo.apiCallCount = 0
 debugInfo.connectionAttempts = 0
-debugInfo.lastCredentialValidation = {
-	lastfm: false,
-	librefm: false,
-	listenbrainz: false,
-}
+	debugInfo.lastCredentialValidation = {
+		lastfm: false,
+		librefm: false,
+		listenbrainz: false,
+		mediasession: false,
+	}
 
 // subscribers for reactivity
 let subscribers: (() => void)[] = []
@@ -87,6 +88,7 @@ export function recordServiceError(service: ServiceType, error: string) {
 		lastfm: [],
 		librefm: [],
 		listenbrainz: [],
+		mediasession: [],
 	}
 	debugInfo.serviceErrors[service] = debugInfo.serviceErrors[service] || []
 	debugInfo.serviceErrors[service].push(`${new Date().toISOString()}: ${error}`)
@@ -109,6 +111,7 @@ export function recordCredentialValidation(
 		lastfm: false,
 		librefm: false,
 		listenbrainz: false,
+		mediasession: false,
 	}
 	debugInfo.lastCredentialValidation[service] = isValid
 	log(`${service} credentials validation:`, isValid ? 'Valid' : 'Invalid')

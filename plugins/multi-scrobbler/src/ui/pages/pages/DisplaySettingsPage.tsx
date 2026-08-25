@@ -16,6 +16,7 @@ export default function DisplaySettingsPage() {
 	const set = (patch: Partial<MultiScrobblerStorage>) => storage?.set(patch)
 
 	const isLibreFm = s.service === 'librefm'
+	const isMediaSession = s.service === 'mediasession'
 	const currentInterval = Number(s.timeInterval)
 
 	return (
@@ -33,37 +34,41 @@ export default function DisplaySettingsPage() {
 					</TableRowGroup>
 
 					<Stack>
-						{isLibreFm ? (
-							<TableRow
-								label="Disabled for Libre.fm"
-								subLabel="Libre.fm requires a fixed 60s update interval to prevent rate limiting"
-								disabled
-							/>
-						) : (
-							<Card style={{ padding: 12 }}>
-								<Stack spacing={6}>
-									<Text
-										variant="text-md/semibold"
-										style={{ color: 'text-normal', marginLeft: 10 }}
-									>
-										Update Interval: {currentInterval}s
-									</Text>
-									<Text
-										variant="text-sm/normal"
-										style={{ color: 'text-muted', marginLeft: 10 }}
-									>
-										Min: {Constants.MIN_UPDATE_INTERVAL}s · Max: 300s
-									</Text>
-									<Slider
-										step={1}
-										value={currentInterval}
-										minimumValue={Constants.MIN_UPDATE_INTERVAL}
-										maximumValue={300}
-										onValueChange={v => set({ timeInterval: Math.round(v) })}
-									/>
-								</Stack>
-							</Card>
-						)}
+						<Card style={{ padding: 12 }}>
+							<Stack spacing={6}>
+								<Text
+									variant="text-md/semibold"
+									style={{ color: 'text-normal', marginLeft: 10 }}
+								>
+									Update Interval:{' '}
+									{isLibreFm
+										? 'fixed at 60s'
+										: isMediaSession
+											? 'not used'
+											: `${currentInterval}s`}
+								</Text>
+								<Text
+									variant="text-sm/normal"
+									style={{ color: 'text-muted', marginLeft: 10 }}
+								>
+									{isLibreFm
+										? 'Libre.fm requires a fixed 60s interval to prevent rate limiting'
+										: isMediaSession
+											? "Reads your device's media state directly — always live, no interval needed"
+											: `Min: ${Constants.MIN_UPDATE_INTERVAL}s · Max: 300s`}
+								</Text>
+								<Slider
+									step={1}
+									value={currentInterval}
+									minimumValue={Constants.MIN_UPDATE_INTERVAL}
+									maximumValue={300}
+									onValueChange={v => {
+										if (!isLibreFm && !isMediaSession)
+											set({ timeInterval: Math.round(v) })
+									}}
+								/>
+							</Stack>
+						</Card>
 					</Stack>
 
 					<TableRowGroup title="About Display Settings">
