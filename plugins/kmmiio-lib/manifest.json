@@ -5,10 +5,14 @@
 	"description": "Shared utility modules and native hooks for kmmiio99o plugins.",
 	"author": "kmmiio99o",
 	"icon": "SettingsIcon",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"dependencies": {
-		"revenge.api": { "version": ">=1" },
-		"discord": { "version": "*" }
+		"revenge.api": {
+			"version": ">=1"
+		},
+		"discord": {
+			"version": "*"
+		}
 	},
 	"dist": {
 		"script": "index.js",

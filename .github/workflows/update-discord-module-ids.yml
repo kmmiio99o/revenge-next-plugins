@@ -32,7 +32,7 @@ jobs:
             git config user.name 'github-actions[bot]'
             git config user.email 'github-actions[bot]@users.noreply.github.com'
             git add .
-            git commit -m "chore(chatbox-avatar): update Discord module IDs (build ${BUILD})"
+            git commit -m "chore(kmmiio-lib): update Discord module IDs (build ${BUILD})"
             git push
           else
             echo 'No module ID changes'
