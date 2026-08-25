@@ -58,9 +58,15 @@ export async function fetchAsset(
 ): Promise<string[]> {
 	if (!asset?.length) return []
 
+	const remoteUrls: string[] = []
+	for (const url of asset) {
+		if (url && !url.startsWith('data:')) remoteUrls.push(url)
+	}
+	if (remoteUrls.length === 0) return []
+
 	try {
 		const assetManager = getAssetManager()
-		const result = await assetManager.fetchAssetIds(appId, asset)
+		const result = await assetManager.fetchAssetIds(appId, remoteUrls)
 
 		// If it returned an actual array with results, use it
 		if (Array.isArray(result) && result.length > 0 && result[0]) {
@@ -68,12 +74,12 @@ export async function fetchAsset(
 		}
 
 		// fetchAssetIds returned empty/broken — try external-assets API
-		const externalUrls = asset.filter(
-			url => url && (url.startsWith('http:') || url.startsWith('https:')),
+		const httpUrls = remoteUrls.filter(
+			url => url.startsWith('http:') || url.startsWith('https:'),
 		)
-		if (externalUrls.length === 0) return []
+		if (httpUrls.length === 0) return []
 
-		return await resolveExternalAssets(externalUrls, appId)
+		return await resolveExternalAssets(httpUrls, appId)
 	} catch (_error) {
 		return []
 	}

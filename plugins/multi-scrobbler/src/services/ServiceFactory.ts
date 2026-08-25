@@ -3,6 +3,7 @@ import { getSettings } from '../lib/state'
 import { LastFmService } from './LastFmService'
 import { LibreFmService } from './LibreFmService'
 import { ListenBrainzService } from './ListenBrainzService'
+import { MediaSessionService } from './MediaSessionService'
 import type { ServiceClient, ServiceType } from '../types'
 
 export class ServiceFactory {
@@ -54,6 +55,8 @@ export class ServiceFactory {
 				return new LibreFmService()
 			case 'listenbrainz':
 				return new ListenBrainzService()
+			case 'mediasession':
+				return new MediaSessionService()
 			default:
 				throw new Error(`[ServiceFactory] Unknown service type: ${serviceType}`)
 		}
@@ -89,7 +92,7 @@ export class ServiceFactory {
 	}
 
 	public getSupportedServices(): ServiceType[] {
-		return ['lastfm', 'librefm', 'listenbrainz']
+		return ['lastfm', 'librefm', 'listenbrainz', 'mediasession']
 	}
 
 	public getServiceDisplayName(serviceType: ServiceType): string {

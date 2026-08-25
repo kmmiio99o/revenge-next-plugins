@@ -28,3 +28,6 @@ file("plugins").listFiles()
     ?.filter { it.isDirectory && File(it, "src/main").isDirectory }
     ?.sortedBy { it.name }
     ?.forEach { dir -> include(":plugins:${dir.name}") }
+
+// Standalone companion APK for the multi-scrobbler plugin (NotificationListenerService host).
+include(":mediasession-companion")

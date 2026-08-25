@@ -27,7 +27,7 @@ export type ActivityAssets = {
 	small_text?: string
 }
 
-export type ServiceType = 'lastfm' | 'librefm' | 'listenbrainz'
+export type ServiceType = 'lastfm' | 'librefm' | 'listenbrainz' | 'mediasession'
 
 export type Track = {
 	name: string

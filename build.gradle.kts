@@ -2,6 +2,7 @@ import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import groovy.json.JsonSlurper
 import java.io.File
+import java.security.MessageDigest
 import java.util.concurrent.Callable
 import javax.inject.Inject
 import org.gradle.process.ExecOperations
@@ -10,6 +11,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 plugins {
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.compose) apply false
 }
 
 val compileSdkVer = libs.versions.compileSdk.get()
@@ -302,3 +305,73 @@ pluginDefs.forEach { (dir, id, jarName, scriptName) ->
 
     packageAllPlugins.configure { dependsOn(pkg) }
 }
+
+// ---------------------------------------------------------------------------------------------
+// Companion Android app (:mediasession-companion), packaged next to the plugins -> dist/.
+// The debug build is auto-signed with the debug key, so it installs without any setup.
+// A sibling <id>.json manifest carries version + checksum so clients can detect updates
+// once the files are deployed to gh-pages.
+// ---------------------------------------------------------------------------------------------
+
+val companionAppId = "dev.kmmiio99o.mediasession"
+val companionAppVersionName = libs.versions.companionAppVersion.get()
+val companionAppVersionCode = libs.versions.companionAppCode.get().toInt()
+
+val companionDistDir = rootProject.layout.projectDirectory.dir("dist")
+val companionApk = companionDistDir.file("$companionAppId.apk")
+val companionInfoJson = companionDistDir.file("$companionAppId.json")
+
+val packageMediasessionCompanion = tasks.register<Copy>("packageMediasessionCompanion") {
+    group = "revenge"
+    description = "Builds the MediaSession Bridge companion app and copies its APK into dist/."
+    mustRunAfter(cleanTasks)
+    dependsOn(":mediasession-companion:assembleDebug")
+
+    from(rootProject.layout.projectDirectory.dir("mediasession-companion/build/outputs/apk/debug")) {
+        include("*.apk")
+        rename { companionApk.asFile.name }
+    }
+    into(companionDistDir)
+
+    doLast { logger.lifecycle("Packaged $companionAppId (companion app) -> ${companionApk.asFile.relativeTo(rootDir)}") }
+}
+
+val generateCompanionAppInfo = tasks.register("generateCompanionAppInfo") {
+    group = "revenge"
+    description = "Writes the $companionAppId.json update manifest for the companion APK."
+    dependsOn(packageMediasessionCompanion)
+    mustRunAfter(cleanTasks)
+
+    inputs.file(companionApk)
+    inputs.property("versionName", companionAppVersionName)
+    inputs.property("versionCode", companionAppVersionCode)
+    outputs.file(companionInfoJson)
+
+    doLast {
+        val apkFile = companionApk.asFile
+        require(apkFile.isFile) { "Companion APK missing: $apkFile" }
+
+        val sha256 = MessageDigest.getInstance("SHA-256").digest(apkFile.readBytes())
+            .joinToString("") { "%02x".format(it) }
+
+        // Note: generate-index only scans *.zip, so this file coexists safely in dist/.
+        companionInfoJson.asFile.writeText(
+            """
+            {
+              "id": "$companionAppId",
+              "name": "MediaSession Bridge",
+              "type": "android-apk",
+              "versionName": "$companionAppVersionName",
+              "versionCode": $companionAppVersionCode,
+              "minSdk": ${libs.versions.minSdk.get()},
+              "file": "${apkFile.name}",
+              "sizeBytes": ${apkFile.length()},
+              "sha256": "$sha256"
+            }
+            """.trimIndent() + "\n",
+        )
+        logger.lifecycle("Wrote ${companionInfoJson.asFile.relativeTo(rootDir)}")
+    }
+}
+
+packageAllPlugins.configure { dependsOn(generateCompanionAppInfo) }

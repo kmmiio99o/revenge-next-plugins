@@ -5,6 +5,7 @@ import LastFmSettingsPage from './pages/LastFmSettingsPage'
 import LibreFmSettingsPage from './pages/LibreFmSettingsPage'
 import ListenBrainzSettingsPage from './pages/ListenBrainzSettingsPage'
 import LoggingSettingsPage from './pages/LoggingSettingsPage'
+import MediaSessionPage from './pages/MediaSessionPage'
 import RPCCustomizationSettingsPage from './pages/RPCCustomizationSettingsPage'
 
 const PREFIX = 'kmmiio99o.multi-scrobbler'
@@ -16,6 +17,7 @@ export const DISPLAY_ROUTE = `${PREFIX}.display`
 export const RPC_ROUTE = `${PREFIX}.rpc`
 export const IGNORE_LIST_ROUTE = `${PREFIX}.ignore-list`
 export const LOGGING_ROUTE = `${PREFIX}.logging`
+export const MEDIA_SESSION_ROUTE = `${PREFIX}.mediasession`
 export const DEBUG_ROUTE = `${PREFIX}.debug`
 
 function refreshSettingsUI() {
@@ -82,6 +84,12 @@ export function registerPages(): () => void {
 			type: 'route',
 			useTitle: () => 'Logging Settings',
 			screen: { route: LOGGING_ROUTE, getComponent: () => LoggingSettingsPage },
+		}),
+		registerSettingsItem(MEDIA_SESSION_ROUTE, {
+			parent: null,
+			type: 'route',
+			useTitle: () => 'Media Session',
+			screen: { route: MEDIA_SESSION_ROUTE, getComponent: () => MediaSessionPage },
 		}),
 		registerSettingsItem(DEBUG_ROUTE, {
 			parent: null,

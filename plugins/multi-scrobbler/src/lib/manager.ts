@@ -91,6 +91,8 @@ class PluginManager {
 
 			if (!lastTrack.nowPlaying) {
 				setDebugInfo('lastTrack_nowPlaying', false)
+				// Forget the track so it is re-sent once playback resumes
+				pluginState.lastTrackUrl = undefined
 				clearActivity()
 				return
 			}
@@ -296,17 +298,24 @@ class PluginManager {
 		await this.updateActivity()
 
 		const currentService = getSettings().service
-		let minInterval: number = Constants.MIN_UPDATE_INTERVAL
 
-		if (currentService === 'librefm') {
-			minInterval = Constants.LIBREFM_MIN_UPDATE_INTERVAL
+		let interval: number
+		if (currentService === 'mediasession') {
+			// MediaSession reads local Android state — no external API to rate limit.
+			// Ignore the user's Update Interval entirely and poll at a fixed fast
+			// tick (a literal 0ms timer would busy-loop the JS thread).
+			interval = 1_000
+		} else {
+			let minInterval: number = Constants.MIN_UPDATE_INTERVAL
+			if (currentService === 'librefm') {
+				minInterval = Constants.LIBREFM_MIN_UPDATE_INTERVAL
+			}
+			interval = Math.max(
+				(Number(getSettings().timeInterval) || Number(DEFAULTS.timeInterval)) *
+					1000,
+				minInterval * 1000,
+			)
 		}
-
-		const interval = Math.max(
-			(Number(getSettings().timeInterval) || Number(DEFAULTS.timeInterval)) *
-				1000,
-			minInterval * 1000,
-		)
 
 		this.updateTimer = setInterval(() => this.updateActivity(), interval)
 	}

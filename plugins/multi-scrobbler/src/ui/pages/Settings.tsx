@@ -9,6 +9,7 @@ import {
 	LIBREFM_ROUTE,
 	LISTENBRAINZ_ROUTE,
 	LOGGING_ROUTE,
+	MEDIA_SESSION_ROUTE,
 	RPC_ROUTE,
 } from './routes'
 import type { PluginApi } from '@revenge-mod/plugins/types'
@@ -48,6 +49,8 @@ export default function Settings({
 					: '❌ Missing credentials'
 			case 'listenbrainz':
 				return s.listenbrainzUsername ? '✅ Configured' : '❌ Missing username'
+			case 'mediasession':
+				return '📱 Uses device media session'
 			default:
 				return '❓ Unknown'
 		}
@@ -69,7 +72,7 @@ export default function Settings({
 							defaultValue={currentService}
 							onChange={handleServiceChange}
 						>
-							{(['lastfm', 'librefm', 'listenbrainz'] as ServiceType[]).map(
+							{(['lastfm', 'librefm', 'listenbrainz', 'mediasession'] as ServiceType[]).map(
 								service => (
 									<TableRadioRow
 										key={service}
@@ -100,6 +103,12 @@ export default function Settings({
 							subLabel="Configure ListenBrainz credentials and options"
 							trailing={<TableRow.Arrow />}
 							onPress={() => navigation.navigate(LISTENBRAINZ_ROUTE)}
+						/>
+						<TableRow
+							label="Media Session"
+							subLabel="View currently playing media from your device"
+							trailing={<TableRow.Arrow />}
+							onPress={() => navigation.navigate(MEDIA_SESSION_ROUTE)}
 						/>
 					</TableRowGroup>
 

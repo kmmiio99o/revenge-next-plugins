@@ -13,6 +13,7 @@ import * as Sheets from './lib/sheets'
 import * as Guild from './lib/guild'
 import * as Registry from './lib/registry'
 import * as Log from './lib/log'
+import * as MediaSession from './lib/mediasession'
 import Settings from './ui/Settings'
 
 const KmmiioLib = {
@@ -29,6 +30,7 @@ const KmmiioLib = {
 	...Guild,
 	...Registry,
 	...Log,
+	...MediaSession,
 }
 
 // Patch native at module load time
