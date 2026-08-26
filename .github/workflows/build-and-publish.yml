@@ -69,13 +69,25 @@ jobs:
           cd revenge-xposed
           ./gradlew :api:publishToMavenLocal --no-daemon
 
-      - name: Build and generate index
+      - name: Fetch existing releases from gh-pages
+        run: |
+          mkdir -p dist
+          git fetch origin gh-pages:gh-pages --depth=1 || true
+          if git rev-parse --verify gh-pages >/dev/null 2>&1; then
+            git ls-tree --name-only gh-pages | grep '\.zip$' | while read f; do
+              git show "gh-pages:$f" > "dist/$f" 2>/dev/null || true
+            done
+          fi
+          echo "Existing ZIPs in dist/:"
+          ls -la dist/*.zip 2>/dev/null || echo "  (none)"
+
+      - name: Build plugins
         run: bun run release --base-url "https://rn.kmmiio99o.dev"
 
       - name: Verify dist artifacts
         run: |
+          echo "Final dist/:"
           ls -la dist/
-          echo "Artifacts ready for publishing"
 
       - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
