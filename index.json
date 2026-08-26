@@ -1,0 +1,218 @@
+{
+  "format": 1,
+  "name": "kmmiio99o's Revenge Next Plugins",
+  "description": "Revenge Next plugins by kmmiio99o. Ports of vd-plugins and other ones.",
+  "icon": "SettingsIcon",
+  "plugins": {
+    "dev.kmmiio99o.alwaystrust": {
+      "name": "Always Trust",
+      "description": "Remove untrusted link confirmation.",
+      "author": "kmmiio99o",
+      "icon": "LinkIcon",
+      "channels": {
+        "latest": "1.0.0"
+      },
+      "versions": {
+        "1.0.0": {
+          "url": "https://rn.kmmiio99o.dev/dev.kmmiio99o.alwaystrust@1.0.0.zip",
+          "sha256": "c0dccbc2df77d18100ac340861b834f38aeb0972aa56c2bf9f555c509001c2e6",
+          "size": 603,
+          "dependencies": {
+            "revenge.api": {
+              "version": ">=1"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        }
+      }
+    },
+    "dev.kmmiio99o.chatbox-avatar": {
+      "name": "Chatbox Avatar",
+      "description": "Quickly view your profile from the chatbox.",
+      "author": "kmmiio99o",
+      "icon": "UserSquareIcon",
+      "channels": {
+        "latest": "1.2.0"
+      },
+      "versions": {
+        "1.2.0": {
+          "url": "https://rn.kmmiio99o.dev/dev.kmmiio99o.chatbox-avatar@1.2.0.zip",
+          "sha256": "15c953c7532fcd7b142c2a04e47a287caebd1f4580584b9264a4e7454af8fd05",
+          "size": 2366,
+          "dependencies": {
+            "revenge.api": {
+              "version": ">=1"
+            },
+            "discord": {
+              "version": "*"
+            },
+            "dev.kmmiio99o.lib": {
+              "version": ">=1"
+            }
+          }
+        }
+      }
+    },
+    "dev.kmmiio99o.chatbubbles": {
+      "name": "Chat Bubbles",
+      "description": "Adds customizable chat bubbles to the chat, similar to Flowercord.",
+      "author": "kmmiio99o",
+      "icon": "ChatIcon",
+      "channels": {
+        "latest": "1.1.0"
+      },
+      "versions": {
+        "1.1.0": {
+          "url": "https://rn.kmmiio99o.dev/dev.kmmiio99o.chatbubbles@1.1.0.zip",
+          "sha256": "33f77b8ded5d5cf0d7851d0c71fc81c1d7d496f82d7febfb2ea58e0f422f99d7",
+          "size": 2461,
+          "dependencies": {
+            "revenge.api": {
+              "version": ">=1"
+            },
+            "discord": {
+              "version": "*"
+            },
+            "dev.kmmiio99o.lib": {
+              "version": ">=1"
+            }
+          }
+        }
+      }
+    },
+    "dev.kmmiio99o.declutter": {
+      "name": "Declutter",
+      "description": "Hide profile clutter: avatar decorations, nameplates, profile effects, profile frames, server tags, and badges. Aswell as Nitro/Payment settings.",
+      "author": "kmmiio99o",
+      "icon": "MagicWandIcon",
+      "channels": {
+        "latest": "1.1.1"
+      },
+      "versions": {
+        "1.1.1": {
+          "url": "https://rn.kmmiio99o.dev/dev.kmmiio99o.declutter@1.1.1.zip",
+          "sha256": "d9a3c2a822bc9d452da1b6941295ea36320e3dd4f0ecc04d04817139f11b0e63",
+          "size": 3606,
+          "dependencies": {
+            "revenge.api": {
+              "version": ">=1"
+            },
+            "discord": {
+              "version": "*"
+            },
+            "dev.kmmiio99o.lib": {
+              "version": ">=1"
+            }
+          }
+        }
+      }
+    },
+    "dev.kmmiio99o.lib": {
+      "name": "kmmiio Library",
+      "description": "Shared utility modules and native hooks for kmmiio99o plugins.",
+      "author": "kmmiio99o",
+      "icon": "SettingsIcon",
+      "channels": {
+        "latest": "1.1.1"
+      },
+      "versions": {
+        "1.1.1": {
+          "url": "https://rn.kmmiio99o.dev/dev.kmmiio99o.lib@1.1.1.zip",
+          "sha256": "5362ab458e91758ceffab7518c78a107b0a09edc5b4c344511f68959d2afd117",
+          "size": 28832,
+          "dependencies": {
+            "revenge.api": {
+              "version": ">=1"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        }
+      }
+    },
+    "dev.kmmiio99o.markdown.toolbar": {
+      "name": "Markdown Toolbar",
+      "description": "Floating markdown formatting bar under chat input.",
+      "author": "kmmiio99o",
+      "icon": "LettersIcon",
+      "channels": {
+        "latest": "1.1.0"
+      },
+      "versions": {
+        "1.1.0": {
+          "url": "https://rn.kmmiio99o.dev/dev.kmmiio99o.markdown.toolbar@1.1.0.zip",
+          "sha256": "f00d9ce92618bd28d8b0acad67d9a7bc683356b344de96d7486db93ab1ae4d36",
+          "size": 2205,
+          "dependencies": {
+            "revenge.api": {
+              "version": ">=1"
+            },
+            "discord": {
+              "version": "*"
+            },
+            "dev.kmmiio99o.lib": {
+              "version": ">=1"
+            }
+          }
+        }
+      }
+    },
+    "dev.kmmiio99o.multi-scrobbler": {
+      "name": "Multi Scrobbler",
+      "description": "Show off your music status from Last.fm, Libre.fm, or ListenBrainz on your Discord profile with comprehensive console logging.",
+      "author": "kmmiio99o",
+      "icon": "MusicIcon",
+      "channels": {
+        "latest": "1.2.0"
+      },
+      "versions": {
+        "1.2.0": {
+          "url": "https://rn.kmmiio99o.dev/dev.kmmiio99o.multi-scrobbler@1.2.0.zip",
+          "sha256": "396b0de3958039a1742f4aa6301e0807d99dbb0f9313e90fd686681719fb98ae",
+          "size": 15220,
+          "dependencies": {
+            "revenge.api": {
+              "version": ">=1"
+            },
+            "discord": {
+              "version": "*"
+            },
+            "dev.kmmiio99o.lib": {
+              "version": ">=1"
+            }
+          }
+        }
+      }
+    },
+    "dev.kmmiio99o.server-info": {
+      "name": "Server Info",
+      "description": "View server information from the guild context menu.",
+      "author": "kmmiio99o",
+      "icon": "CircleInformationIcon",
+      "channels": {
+        "latest": "1.2.0"
+      },
+      "versions": {
+        "1.2.0": {
+          "url": "https://rn.kmmiio99o.dev/dev.kmmiio99o.server-info@1.2.0.zip",
+          "sha256": "855bbfb3e7fe28dfd3ebb7266de787c611df9ec9eb143e81f43b9549e6b7bb8f",
+          "size": 4378,
+          "dependencies": {
+            "revenge.api": {
+              "version": ">=1"
+            },
+            "discord": {
+              "version": "*"
+            },
+            "dev.kmmiio99o.lib": {
+              "version": ">=1"
+            }
+          }
+        }
+      }
+    }
+  }
+}
