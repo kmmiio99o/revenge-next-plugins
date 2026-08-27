@@ -5,7 +5,7 @@
 	"description": "Shared utility modules and native hooks for kmmiio99o plugins.",
 	"author": "kmmiio99o",
 	"icon": "SettingsIcon",
-	"version": "1.1.1",
+	"version": "1.1.2",
 	"dependencies": {
 		"revenge.api": {
 			"version": ">=1"
