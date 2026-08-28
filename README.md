@@ -1,3 +1,5 @@
+# Repository archived, it has been moved to [git.gay](https://git.gay/kmmiio99o/revenge-next-plugins) (blame Github for bad Actions management)
+
 # [kmmiio99o's](https://kmmiio99o.dev) Revenge Next Plugins
 
 A collection of plugins for the [**Revenge Next**](https://github.com/revenge-mod/revenge-bundle-next) Discord mobile client.
